@@ -28,7 +28,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-project(examples)
+project(distance)
 
-add_subdirectory(distance)
-add_subdirectory(memory_attach)
+add_executable(${PROJECT_NAME}
+  main.cpp
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE sqlite_functions)

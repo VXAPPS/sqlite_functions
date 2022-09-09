@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-project(app)
+project(memory_attach)
 
 add_executable(${PROJECT_NAME}
   main.cpp
