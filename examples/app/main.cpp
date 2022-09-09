@@ -38,10 +38,10 @@
 int main() {
 
   /* Open database */
-  std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( "/bin/memory" ) };
+  std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
   if ( !database ) {
 
-    std::cout << __LINE__ << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
@@ -54,7 +54,7 @@ int main() {
   int resultCode = sqlite3_create_function( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &vx::sqlite_utils::distance, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << __LINE__ << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
@@ -62,7 +62,7 @@ int main() {
   resultCode = sqlite3_create_function( database.get(), "ascii", 1, SQLITE_UTF8, nullptr, &vx::sqlite_utils::ascii, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << __LINE__ << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
