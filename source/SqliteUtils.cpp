@@ -141,9 +141,9 @@ namespace vx::sqlite_utils {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
     std::span args( _argv, static_cast<std::size_t>( _argc ) );
-    if ( args.size() != 1 && ( sqlite3_value_type( args[0] ) == SQLITE_NULL ) ) {
+    if ( args.size() != 1 && ( sqlite3_value_type( args[ 0 ] ) == SQLITE_NULL ) ) {
 #else
-    if ( _argc != 1 && ( sqlite3_value_type( _argv[0] ) == SQLITE_NULL ) ) {
+    if ( _argc != 1 && ( sqlite3_value_type( _argv[ 0 ] ) == SQLITE_NULL ) ) {
 #endif
 
       sqlite3_result_null( _context );
