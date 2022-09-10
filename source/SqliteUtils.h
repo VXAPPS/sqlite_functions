@@ -59,7 +59,25 @@ namespace vx::sqlite_utils {
     }
   };
 
+  struct sqlite3_stmt_deleter {
+
+    void operator()( sqlite3_stmt *_statement ) {
+
+      [[maybe_unused]] int resultCode = sqlite3_finalize( _statement );
+#ifdef DEBUG
+      if ( resultCode != SQLITE_OK ) {
+
+        std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+        std::cout << std::endl;
+      }
+#endif
+    }
+  };
+
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename );
+
+  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_database, //std::unique_ptr<sqlite3, sqlite3_deleter> _database,
+                                                                                const std::string &_sql );
 
   int output_callback( void *_data,
                        int _argc,

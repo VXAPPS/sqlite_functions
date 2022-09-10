@@ -69,8 +69,6 @@ int main() {
   }
 
   /* Create table */
-//  char* error_msg{};
-//  scope_exit cleaner_upper{[&] { sqlite3_free(error_msg); }};
   std::string sql = "CREATE TABLE cities (city STRING, latitude REAL, longitude REAL)";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {

@@ -36,6 +36,9 @@
 #include <span>
 #endif
 
+/* sqlite header */
+#include <sqlite3.h>
+
 /* local header */
 #include "SqliteUtils.h"
 
@@ -60,6 +63,23 @@ namespace vx::sqlite_utils {
       database.reset();
     }
     return database;
+  }
+
+  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_database, //std::unique_ptr<sqlite3, sqlite3_deleter> _database,
+                                                                                const std::string &_sql ) {
+
+    sqlite3_stmt *statementHandle = nullptr;
+    int resultCode = sqlite3_prepare_v2( _database, _sql.c_str(), -1, &statementHandle, nullptr );
+    std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> statement { statementHandle };
+    if ( resultCode != SQLITE_OK ) {
+
+#ifdef DEBUG
+      std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+      std::cout << std::endl;
+#endif
+      statement.reset();
+    }
+    return statement;
   }
 
   int output_callback( [[maybe_unused]] void *_data,
