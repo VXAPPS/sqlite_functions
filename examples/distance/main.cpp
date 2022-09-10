@@ -36,6 +36,14 @@
 /* sqlite_functions */
 #include <SqliteUtils.h>
 
+/*
+ * SQL DATA
+ *      city | latitude | longitude
+ * Munich    |  48.1375 |    11.575
+ * New York  |  40.6943 |  -73.9249
+ * Tokyo     |  35.6839 |  139.7744
+ */
+
 int main() {
 
   /* Open database */
@@ -69,7 +77,7 @@ int main() {
   }
 
   /* Insert data */
-  sql = "INSERT INTO cities VALUES ('New York', 40.6943, -73.9249)";
+  sql = "INSERT INTO cities VALUES('New York', 40.6943, -73.9249)";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
@@ -80,7 +88,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  sql = "INSERT INTO cities VALUES ('Tokyo', 35.6839, 139.7744)";
+  sql = "INSERT INTO cities VALUES('Tokyo', 35.6839, 139.7744)";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
@@ -91,7 +99,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  sql = "INSERT INTO cities VALUES ('Munich', 48.1375, 11.575)";
+  sql = "INSERT INTO cities VALUES('Munich', 48.1375, 11.575)";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
@@ -108,10 +116,10 @@ int main() {
   constexpr double longitude = 13.3833;
 
 #ifdef DEBUG
-  std::string sql2Expect = "SELECT DISTANCE( latitude, longitude, 52.5167, 13.3833 ) AS distance FROM cities WHERE city IS 'Munich'";
+  std::string sql2Expect = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'Munich'";
 #endif
 
-  sql = "SELECT DISTANCE( latitude, longitude, ?1, ?2 ) AS distance FROM cities WHERE city IS 'Munich'";
+  sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Munich'";
   std::unique_ptr<sqlite3_stmt, vx::sqlite_utils::sqlite3_stmt_deleter> statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
   resultCode = sqlite3_bind_double( statement.get(), 1, latitude );
   if ( resultCode != SQLITE_OK ) {
@@ -174,7 +182,7 @@ int main() {
   }
 #endif
 
-  sql = "SELECT DISTANCE( latitude, longitude, '52.5167', '13.3833' ) AS distance FROM cities WHERE city IS 'New York'";
+  sql = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'New York'";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
@@ -185,7 +193,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  sql = "SELECT DISTANCE( latitude, longitude, '52.5167', '13.3833' ) AS distance FROM cities WHERE city IS 'Tokyo'";
+  sql = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'Tokyo'";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
@@ -195,6 +203,5 @@ int main() {
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
-
   return EXIT_SUCCESS;
 }
