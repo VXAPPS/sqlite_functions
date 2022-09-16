@@ -31,7 +31,11 @@
 /* stl header */
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <memory>
+
+/* sqlite header */
+#include <sqlite3.h>
 
 /* sqlite_functions */
 #include <SqliteUtils.h>
@@ -55,7 +59,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  int resultCode = sqlite3_create_function( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &vx::sqlite_utils::distance, nullptr, nullptr );
+  int resultCode = sqlite3_create_function_v2( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &vx::sqlite_utils::distance, nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;

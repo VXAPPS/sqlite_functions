@@ -35,52 +35,31 @@
 #include <memory>
 #include <string>
 
-/* sqlite header */
-#include <sqlite3.h>
+/* foreware declation of sqlite3 */
+struct sqlite3;
+struct sqlite3_context;
+struct sqlite3_stmt;
+struct sqlite3_value;
 
 /**
  * @brief vx (VX APPS) namespace.
  */
 namespace vx::sqlite_utils {
 
-  struct sqlite3_deleter {
+struct sqlite3_deleter {
 
-    void operator()( sqlite3 *_databaseHandle ) const {
+  void operator()( sqlite3 *_handle ) const;
+};
 
-      [[maybe_unused]] int resultCode = sqlite3_close( _databaseHandle );
-#ifdef DEBUG
-      if ( resultCode != SQLITE_OK ) {
+struct sqlite3_stmt_deleter {
 
-        std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-        std::cout << "ERROR: '" << sqlite3_errmsg( _databaseHandle ) << "'" << std::endl;
-        std::cout << std::endl;
-      }
-#endif
-    }
-  };
+  void operator()( sqlite3_stmt *_statement ) const;
+};
 
-  struct sqlite3_stmt_deleter {
+struct sqlite3_dump_deleter {
 
-    void operator()( sqlite3_stmt *_statement ) {
-
-      [[maybe_unused]] int resultCode = sqlite3_finalize( _statement );
-#ifdef DEBUG
-      if ( resultCode != SQLITE_OK ) {
-
-        std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-        std::cout << std::endl;
-      }
-#endif
-    }
-  };
-
-  struct sqlite3_dump_deleter {
-
-    void operator()( void *_what ) {
-
-      sqlite3_free( _what );
-    }
-  };
+  void operator()( void *_what ) const;
+};
 
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename );
 

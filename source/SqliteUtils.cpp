@@ -33,7 +33,7 @@
 
 /* stl header */
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
-#include <span>
+  #include <span>
 #endif
 
 /* sqlite header */
@@ -47,6 +47,36 @@ namespace vx::sqlite_utils {
   constexpr int halfCircleDegree = 180;
 
   constexpr double earthBlubKm = 6378.137;
+
+  void sqlite3_deleter::operator()( sqlite3 *_handle ) const {
+
+    [[maybe_unused]] int resultCode = sqlite3_close( _handle );
+#ifdef DEBUG
+    if ( resultCode != SQLITE_OK ) {
+
+      std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+      std::cout << "ERROR: '" << sqlite3_errmsg( _handle ) << "'" << std::endl;
+      std::cout << std::endl;
+    }
+#endif
+  }
+
+  void sqlite3_stmt_deleter::operator()( sqlite3_stmt *_statement ) const {
+
+    [[maybe_unused]] int resultCode = sqlite3_finalize( _statement );
+#ifdef DEBUG
+    if ( resultCode != SQLITE_OK ) {
+
+      std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+      std::cout << std::endl;
+    }
+#endif
+  }
+
+  void sqlite3_dump_deleter::operator()( void *_what ) const {
+
+    sqlite3_free( _what );
+  }
 
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename ) {
 

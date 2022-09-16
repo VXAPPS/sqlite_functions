@@ -32,6 +32,9 @@
 #include <iostream>
 #include <memory>
 
+/* sqlite header */
+#include <sqlite3.h>
+
 /* sqlite_functions */
 #include <SqliteUtils.h>
 
