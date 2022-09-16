@@ -239,5 +239,17 @@ int main() {
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
+
+  sql = "PRAGMA database_list";
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
+  if ( resultCode != SQLITE_OK ) {
+
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "SQL: '" << sql << "'" << std::endl;
+    std::cout << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }

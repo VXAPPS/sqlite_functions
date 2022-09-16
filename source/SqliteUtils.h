@@ -74,6 +74,14 @@ namespace vx::sqlite_utils {
     }
   };
 
+  struct sqlite3_dump_deleter {
+
+    void operator()( void *_what ) {
+
+      sqlite3_free( _what );
+    }
+  };
+
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename );
 
   std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_database, //std::unique_ptr<sqlite3, sqlite3_deleter> _database,
