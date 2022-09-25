@@ -35,7 +35,7 @@
 #include <memory>
 #include <string>
 
-/* foreware declation of sqlite3 */
+/* forward declation of sqlite3 */
 struct sqlite3;
 struct sqlite3_context;
 struct sqlite3_stmt;
@@ -46,24 +46,24 @@ struct sqlite3_value;
  */
 namespace vx::sqlite_utils {
 
-struct sqlite3_deleter {
+  struct sqlite3_deleter {
 
-  void operator()( sqlite3 *_handle ) const;
-};
+    void operator()( sqlite3 *_handle ) const;
+  };
 
-struct sqlite3_stmt_deleter {
+  struct sqlite3_stmt_deleter {
 
-  void operator()( sqlite3_stmt *_statement ) const;
-};
+    void operator()( sqlite3_stmt *_statement ) const;
+  };
 
-struct sqlite3_dump_deleter {
+  struct sqlite3_dump_deleter {
 
-  void operator()( void *_what ) const;
-};
+    void operator()( void *_what ) const;
+  };
 
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename );
 
-  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_database, //std::unique_ptr<sqlite3, sqlite3_deleter> _database,
+  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_database, // std::unique_ptr<sqlite3, sqlite3_deleter> _database,
                                                                                 const std::string &_sql );
 
   int output_callback( void *_data,

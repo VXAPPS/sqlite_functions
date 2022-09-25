@@ -32,3 +32,5 @@ project(examples)
 
 add_subdirectory(distance)
 add_subdirectory(memory_attach)
+
+add_subdirectory(audit_events)
