@@ -33,6 +33,7 @@
 #include <cstddef> // std::byte
 
 /* stl header */
+#include <filesystem>
 #include <fstream>
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
   #include <span>
@@ -58,7 +59,7 @@ namespace vx::sqlite_utils {
 
   void sqlite3_deleter::operator()( sqlite3 *_handle ) const {
 
-    [[maybe_unused]] int resultCode = sqlite3_close( _handle );
+    [[maybe_unused]] const int resultCode = sqlite3_close( _handle );
 #ifdef DEBUG
     if ( resultCode != SQLITE_OK ) {
 
@@ -72,7 +73,7 @@ namespace vx::sqlite_utils {
 
   void sqlite3_stmt_deleter::operator()( sqlite3_stmt *_statement ) const {
 
-    [[maybe_unused]] int resultCode = sqlite3_finalize( _statement );
+    [[maybe_unused]] const int resultCode = sqlite3_finalize( _statement );
 #ifdef DEBUG
     if ( resultCode != SQLITE_OK ) {
 
@@ -96,7 +97,7 @@ namespace vx::sqlite_utils {
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename ) {
 
     sqlite3 *databaseHandle = nullptr;
-    int resultCode = sqlite3_open( _filename.c_str(), &databaseHandle );
+    const int resultCode = sqlite3_open( _filename.c_str(), &databaseHandle );
     std::unique_ptr<sqlite3, sqlite3_deleter> database { databaseHandle };
     if ( resultCode != SQLITE_OK ) {
 
@@ -115,7 +116,7 @@ namespace vx::sqlite_utils {
                                                                                 const std::string &_sql ) {
 
     sqlite3_stmt *statementHandle = nullptr;
-    int resultCode = sqlite3_prepare_v2( _handle, _sql.c_str(), -1, &statementHandle, nullptr );
+    const int resultCode = sqlite3_prepare_v2( _handle, _sql.c_str(), -1, &statementHandle, nullptr );
     std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> statement { statementHandle };
     if ( resultCode != SQLITE_OK ) {
 
@@ -133,6 +134,10 @@ namespace vx::sqlite_utils {
                    const std::string &_schema,
                    const std::string &_filename ) {
 
+    if ( !std::filesystem::exists( _filename ) ) {
+
+      return SQLITE_OK;
+    }
     /* Dump database */
     /*    sqlite3_int64 serializationSize = 0;
         std::unique_ptr<unsigned char, sqlite3_dump_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
@@ -158,7 +163,7 @@ namespace vx::sqlite_utils {
     if ( !input.eof() && !input.fail() ) {
 
       input.seekg( 0, std::ios_base::end );
-      std::streampos size = input.tellg();
+      const std::streampos size = input.tellg();
       std::cout << "input2 " << size << std::endl;
       dump.resize( static_cast<std::size_t>( size ) );
 
@@ -187,7 +192,7 @@ namespace vx::sqlite_utils {
 //    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), fs);
 //    std::cout << "buffer " << buffer.size() << std::endl;
 
-    int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), converted.data(), static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), 0 ); //, SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
+    const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), converted.data(), static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), 0 ); //, SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
     if ( resultCode != SQLITE_OK ) {
 
 #ifdef DEBUG
@@ -207,7 +212,7 @@ namespace vx::sqlite_utils {
 
     /* Dump database */
     sqlite3_int64 serializationSize = 0;
-    std::unique_ptr<unsigned char, sqlite3_generic_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
+    const std::unique_ptr<unsigned char, sqlite3_generic_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
     if ( !dump || serializationSize == 0 ) {
 
       return SQLITE_ERROR;
@@ -236,7 +241,7 @@ namespace vx::sqlite_utils {
 
     /* Parameter count mismatch */
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
-    std::span args( _argv, static_cast<std::size_t>( _argc ) );
+    const std::span args( _argv, static_cast<std::size_t>( _argc ) );
     if ( args.size() != 4 ) {
 #else
     if ( _argc != 4 ) {
@@ -268,15 +273,15 @@ namespace vx::sqlite_utils {
 #endif
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
-    double latitude1 = sqlite3_value_double( args[ 0 ] );
-    double longitude1 = sqlite3_value_double( args[ 1 ] );
-    double latitude2 = sqlite3_value_double( args[ 2 ] );
-    double longitude2 = sqlite3_value_double( args[ 3 ] );
+    const double latitude1 = sqlite3_value_double( args[ 0 ] );
+    const double longitude1 = sqlite3_value_double( args[ 1 ] );
+    const double latitude2 = sqlite3_value_double( args[ 2 ] );
+    const double longitude2 = sqlite3_value_double( args[ 3 ] );
 #else
-    double latitude1 = sqlite3_value_double( _argv[ 0 ] );
-    double longitude1 = sqlite3_value_double( _argv[ 1 ] );
-    double latitude2 = sqlite3_value_double( _argv[ 2 ] );
-    double longitude2 = sqlite3_value_double( _argv[ 3 ] );
+    const double latitude1 = sqlite3_value_double( _argv[ 0 ] );
+    const double longitude1 = sqlite3_value_double( _argv[ 1 ] );
+    const double latitude2 = sqlite3_value_double( _argv[ 2 ] );
+    const double longitude2 = sqlite3_value_double( _argv[ 3 ] );
 #endif
     sqlite3_result_double( _context, std::acos( sin( latitude1 / halfCircleDegree * M_PI ) * std::sin( latitude2 / halfCircleDegree * M_PI ) + std::cos( latitude1 / halfCircleDegree * M_PI ) * std::cos( latitude2 / halfCircleDegree * M_PI ) * std::cos( ( longitude2 / halfCircleDegree * M_PI ) - ( longitude1 / halfCircleDegree * M_PI ) ) ) * earthBlubKm );
   }
@@ -286,7 +291,7 @@ namespace vx::sqlite_utils {
               sqlite3_value **_argv ) {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
-    std::span args( _argv, static_cast<std::size_t>( _argc ) );
+    const std::span args( _argv, static_cast<std::size_t>( _argc ) );
     if ( args.size() != 1 && ( sqlite3_value_type( args[ 0 ] ) == SQLITE_NULL ) ) {
 #else
     if ( _argc != 1 && ( sqlite3_value_type( _argv[ 0 ] ) == SQLITE_NULL ) ) {
@@ -314,8 +319,8 @@ namespace vx::sqlite_utils {
                        char **_columns ) {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
-    std::span args( _argv, static_cast<std::size_t>( _argc ) );
-    std::span columns( _columns, static_cast<std::size_t>( _argc ) );
+    const std::span args( _argv, static_cast<std::size_t>( _argc ) );
+    const std::span columns( _columns, static_cast<std::size_t>( _argc ) );
     for ( std::size_t i = 0; i < args.size(); ++i ) {
 
       std::cout << columns[ i ] << " = " << ( args[ i ] ? args[ i ] : "NULL" ) << std::endl;

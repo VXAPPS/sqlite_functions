@@ -51,7 +51,7 @@
 int main() {
 
   /* Open database */
-  std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+  const std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
   if ( !database ) {
 
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
@@ -120,11 +120,11 @@ int main() {
   constexpr double longitude = 13.3833;
 
 #ifdef DEBUG
-  std::string sql2Expect = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'Munich'";
+  const std::string sql2Expect = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'Munich'";
 #endif
 
   sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Munich'";
-  std::unique_ptr<sqlite3_stmt, vx::sqlite_utils::sqlite3_stmt_deleter> statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+  const std::unique_ptr<sqlite3_stmt, vx::sqlite_utils::sqlite3_stmt_deleter> statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
   resultCode = sqlite3_bind_double( statement.get(), 1, latitude );
   if ( resultCode != SQLITE_OK ) {
 
@@ -145,7 +145,7 @@ int main() {
   }
 
 #ifdef DEBUG
-  std::string expandedSql = sqlite3_expanded_sql( statement.get() );
+  const std::string expandedSql = sqlite3_expanded_sql( statement.get() );
   if ( sql2Expect != expandedSql ) {
 
     std::cout << "RESULT AFTER BIND MISMATCH" << std::endl;
@@ -157,7 +157,7 @@ int main() {
 
   while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
-    double distance = sqlite3_column_double( statement.get(), 0 );
+    const double distance = sqlite3_column_double( statement.get(), 0 );
     /* Everything inside sqlite3 is handled as text! */
     /* std::string distance = reinterpret_cast<const char *>( sqlite3_column_text( statement.get(), 0 ) ); */
     /* Begin to print out the complete double precision! - this is just needed once! */

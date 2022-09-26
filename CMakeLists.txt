@@ -42,7 +42,3 @@ if(SQLITE_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
-
-message(${SQLite4_INCLUDE_DIRS})
-message(${SQLite4_LIBRARIES})
-#message(${SQLite3_VERSION})

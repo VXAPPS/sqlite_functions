@@ -67,7 +67,7 @@ int main() {
   std::cout << SQLITE_VERSION << std::endl;
 
   /* Open database */
-  std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+  const std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
   if ( !database ) {
 
     std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
@@ -146,15 +146,15 @@ int main() {
   }
   else {
 
-    std::string _schema = "second";
-    std::string _filename = "second_test.sqlite3";
+    const std::string _schema = "second";
+    const std::string _filename = "second_test.sqlite3";
 
     std::vector<char> dump {};
     std::ifstream input( _filename, std::ios::in | std::ios::binary );
     if ( !input.eof() && !input.fail() ) {
 
       input.seekg( 0, std::ios_base::end );
-      std::streampos size = input.tellg();
+      const std::streampos size = input.tellg();
       std::cout << "input2 " << size << std::endl;
       dump.resize( static_cast<std::size_t>( size ) );
 
@@ -332,9 +332,9 @@ int main() {
     return EXIT_FAILURE;
   }
 
-//  vx::sqlite_utils::export_dump( database.get(), "main", "main_test.sqlite3" );
-//  vx::sqlite_utils::export_dump( database.get(), "second", "second_test.sqlite3" );
-//  vx::sqlite_utils::export_dump( database.get(), "third", "third_test.sqlite3" );
+  vx::sqlite_utils::export_dump( database.get(), "main", "main_test.sqlite3" );
+  vx::sqlite_utils::export_dump( database.get(), "second", "second_test.sqlite3" );
+  vx::sqlite_utils::export_dump( database.get(), "third", "third_test.sqlite3" );
 
   resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS forth", nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
