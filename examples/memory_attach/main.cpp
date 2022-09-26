@@ -29,8 +29,10 @@
  */
 
 /* stl header */
+#include <fstream>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 /* sqlite header */
 #include <sqlite3.h>
@@ -62,10 +64,13 @@
 
 int main() {
 
+  std::cout << SQLITE_VERSION << std::endl;
+
   /* Open database */
   std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
   if ( !database ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
@@ -76,6 +81,7 @@ int main() {
   int resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -88,6 +94,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -99,6 +106,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -110,17 +118,21 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
+
+//  vx::sqlite_utils::export_dump( database.get(), "main", "main_test.sqlite3" );
 
   /* SECOND DB */
   resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS second", nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -128,11 +140,67 @@ int main() {
     return EXIT_FAILURE;
   }
 
+  if ( true ) {
+
+    std::cout << vx::sqlite_utils::import_dump( database.get(), "second", "second_test.sqlite3" ) << std::endl;
+  }
+  else {
+
+    std::string _schema = "second";
+    std::string _filename = "second_test.sqlite3";
+
+    std::vector<char> dump {};
+    std::ifstream input( _filename, std::ios::in | std::ios::binary );
+    if ( !input.eof() && !input.fail() ) {
+
+      input.seekg( 0, std::ios_base::end );
+      std::streampos size = input.tellg();
+      std::cout << "input2 " << size << std::endl;
+      dump.resize( static_cast<std::size_t>( size ) );
+
+      input.seekg( 0, std::ios_base::beg );
+      input.read( dump.data(), size );
+    }
+    input.close();
+
+    std::cout << "input " << dump.size() << std::endl;
+    std::cout << "input " << dump.data() << std::endl;
+    std::vector<unsigned char> converted( std::begin( dump ), std::end( dump ) );
+    if ( converted.empty() ) {
+
+      return SQLITE_ERROR;
+    }
+    std::cout << "input neu " << converted.size() << std::endl;
+  //    std::vector<unsigned char> converted {};
+  //    std::copy(dump.begin(), dump.end(), std::back_inserter(converted));
+  //    std::streamoff fs = input.tellg();
+
+
+  //    input >> data.data();
+  //    input.close();
+
+    // copies all data into buffer
+  //    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), fs);
+  //    std::cout << "buffer " << buffer.size() << std::endl;
+
+    resultCode = sqlite3_deserialize( database.get(), _schema.c_str(), converted.data(), static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
+    if ( resultCode != SQLITE_OK ) {
+
+      std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
+      std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+      std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+      std::cout << "SQL: '" << sql << "'" << std::endl;
+      std::cout << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
   /* Create table */
-  sql = "CREATE TABLE second.cities (city STRING, latitude REAL, longitude REAL)";
+  sql = "CREATE TABLE IF NOT EXISTS second.cities (city STRING, latitude REAL, longitude REAL)";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -145,6 +213,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -156,6 +225,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -167,6 +237,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -178,6 +249,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS third", nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -190,6 +262,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -202,6 +275,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -213,6 +287,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -224,6 +299,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -232,10 +308,11 @@ int main() {
   }
 
   /* Overall SELECT */
-  sql = "SELECT * FROM cities UNION ALL SELECT * FROM second.cities UNION ALL SELECT * FROM third.cities ORDER BY city LIMIT 3, 3";
+  sql = "SELECT * FROM cities UNION ALL SELECT * FROM second.cities UNION ALL SELECT * FROM third.cities ORDER BY city"; // LIMIT 3, 3";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
@@ -247,12 +324,30 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
+
+//  vx::sqlite_utils::export_dump( database.get(), "main", "main_test.sqlite3" );
+//  vx::sqlite_utils::export_dump( database.get(), "second", "second_test.sqlite3" );
+//  vx::sqlite_utils::export_dump( database.get(), "third", "third_test.sqlite3" );
+
+  resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS forth", nullptr, nullptr, nullptr );
+  if ( resultCode != SQLITE_OK ) {
+
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "SQL: '" << sql << "'" << std::endl;
+    std::cout << std::endl;
+    return EXIT_FAILURE;
+  }
+
+//  std::cout << vx::sqlite_utils::import_dump( database.get(), "forth", "second_test.sqlite3" ) << std::endl;
 
   return EXIT_SUCCESS;
 }

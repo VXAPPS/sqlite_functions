@@ -56,9 +56,14 @@ namespace vx::sqlite_utils {
     void operator()( sqlite3_stmt *_statement ) const;
   };
 
-  struct sqlite3_dump_deleter {
+  struct sqlite3_generic_deleter {
 
     void operator()( void *_what ) const;
+  };
+
+  struct sqlite3_str_deleter {
+
+    void operator()( char *_what ) const;
   };
 
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename );
@@ -66,10 +71,13 @@ namespace vx::sqlite_utils {
   std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_database, // std::unique_ptr<sqlite3, sqlite3_deleter> _database,
                                                                                 const std::string &_sql );
 
-  int output_callback( void *_data,
-                       int _argc,
-                       char **_argv,
-                       char **_columns );
+  int import_dump( sqlite3 *_handle,
+                   const std::string &_schema,
+                   const std::string &_filename );
+
+  int export_dump( sqlite3 *_handle,
+                   const std::string &_schema,
+                   const std::string &_filename );
 
   /**
    * @brief Calculate the distance inside sql command.
@@ -85,4 +93,9 @@ namespace vx::sqlite_utils {
   void ascii( sqlite3_context *_context,
               int _argc,
               sqlite3_value **_argv );
+
+  int output_callback( void *_data,
+                       int _argc,
+                       char **_argv,
+                       char **_columns );
 }

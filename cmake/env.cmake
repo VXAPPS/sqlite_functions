@@ -33,7 +33,7 @@ option(CMAKE_VERBOSE_MAKEFILE "Show the complete build commands" OFF)
 
 # possibility to disable build steps
 option(SQLITE_BUILD_EXAMPLES "Build examples for sqlite_functions" ON)
-option(SQLITE_BUILD_TESTS "Build tests for sqlite_functions" ON)
+option(SQLITE_BUILD_TESTS "Build tests for sqlite_functions" OFF)
 
 # General
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
