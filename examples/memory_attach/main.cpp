@@ -142,7 +142,8 @@ int main() {
 
   if ( true ) {
 
-    std::cout << vx::sqlite_utils::import_dump( database.get(), "second", "second_test.sqlite3" ) << std::endl;
+    auto [ resultCodeImport, resultMessageImport ] = vx::sqlite_utils::import_dump( database.get(), "second", "second_test.sqlite3" );
+    std::cout << resultCodeImport << " " << resultMessageImport << std::endl;
   }
   else {
 

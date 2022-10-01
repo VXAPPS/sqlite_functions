@@ -71,13 +71,13 @@ namespace vx::sqlite_utils {
   std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_handle,
                                                                                 const std::string &_sql );
 
-  int import_dump( sqlite3 *_handle,
-                   const std::string &_schema,
-                   const std::string &_filename );
+  std::tuple<int, std::string> import_dump( sqlite3 *_handle,
+                                            const std::string &_schema,
+                                            const std::string &_filename );
 
-  int export_dump( sqlite3 *_handle,
-                   const std::string &_schema,
-                   const std::string &_filename );
+  std::tuple<int, std::string> export_dump( sqlite3 *_handle,
+                                            const std::string &_schema,
+                                            const std::string &_filename );
 
   /**
    * @brief Calculate the distance inside sql command.

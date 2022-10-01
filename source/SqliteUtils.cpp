@@ -89,9 +89,9 @@ namespace vx::sqlite_utils {
     sqlite3_free( _what );
   }
 
-  void sqlite3_str_deleter::operator()(char* _what) const {
+  void sqlite3_str_deleter::operator()( char *_what ) const {
 
-    sqlite3_generic_deleter{}(static_cast<void*>(_what));
+    sqlite3_generic_deleter {}( static_cast<void *>( _what ) );
   }
 
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename ) {
@@ -130,32 +130,14 @@ namespace vx::sqlite_utils {
     return statement;
   }
 
-  int import_dump( sqlite3 *_handle,
-                   const std::string &_schema,
-                   const std::string &_filename ) {
+  std::tuple<int, std::string> import_dump( sqlite3 *_handle,
+                                            const std::string &_schema,
+                                            const std::string &_filename ) {
 
     if ( !std::filesystem::exists( _filename ) ) {
 
-      return SQLITE_OK;
+      return { SQLITE_OK, "File not found." };
     }
-    /* Dump database */
-    /*    sqlite3_int64 serializationSize = 0;
-        std::unique_ptr<unsigned char, sqlite3_dump_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
-        if ( serializationSize == 0 ) {
-
-          return SQLITE_ERROR;
-        }
-
-        std::vector<char> converted( dump.get(), dump.get() + serializationSize );
-        if ( converted.empty() ) {
-
-          return SQLITE_ERROR;
-        }
-
-        std::ofstream output;
-        output.open( _filename, std::ofstream::out | std::ofstream::binary );
-        output.write( converted.data(), static_cast<std::streamsize>( converted.size() ) );
-        output.close(); */
 
     // TODO(FB) Fehlerbehandlung und Exceptions - wenn ich es nicht schreiben kann? Wenn nicht genügend Platz vorhanden ist usw. usw.
     std::vector<char> dump {};
@@ -164,7 +146,6 @@ namespace vx::sqlite_utils {
 
       input.seekg( 0, std::ios_base::end );
       const std::streampos size = input.tellg();
-      std::cout << "input2 " << size << std::endl;
       dump.resize( static_cast<std::size_t>( size ) );
 
       input.seekg( 0, std::ios_base::beg );
@@ -172,27 +153,16 @@ namespace vx::sqlite_utils {
     }
     input.close();
 
-    std::cout << "input " << dump.size() << std::endl;
-    std::cout << "input " << dump.data() << std::endl;
     std::vector<unsigned char> converted( std::begin( dump ), std::end( dump ) );
     if ( converted.empty() ) {
 
-      return SQLITE_ERROR;
+      return { SQLITE_IOERR, "Cannot read data from file." };
     }
-    std::cout << "input neu " << converted.size() << std::endl;
-//    std::vector<unsigned char> converted {};
-//    std::copy(dump.begin(), dump.end(), std::back_inserter(converted));
-//    std::streamoff fs = input.tellg();
 
+    std::shared_ptr<unsigned char> databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
+    std::memcpy( databuffer.get(), converted.data(), converted.size() );
 
-//    input >> data.data();
-//    input.close();
-
-    // copies all data into buffer
-//    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), fs);
-//    std::cout << "buffer " << buffer.size() << std::endl;
-
-    const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), converted.data(), static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), 0 ); //, SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
+    const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer.get(), static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
     if ( resultCode != SQLITE_OK ) {
 
 #ifdef DEBUG
@@ -201,38 +171,36 @@ namespace vx::sqlite_utils {
       std::cout << "ERROR: '" << sqlite3_errmsg( _handle ) << "'" << std::endl;
       std::cout << std::endl;
 #endif
+      return { resultCode, sqlite3_errmsg( _handle ) };
     }
 
-    return 0;
+    return {};
   }
 
-  int export_dump( sqlite3 *_handle,
-                   const std::string &_schema,
-                   const std::string &_filename ) {
+  std::tuple<int, std::string> export_dump( sqlite3 *_handle,
+                                            const std::string &_schema,
+                                            const std::string &_filename ) {
 
     /* Dump database */
     sqlite3_int64 serializationSize = 0;
     const std::unique_ptr<unsigned char, sqlite3_generic_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
     if ( !dump || serializationSize == 0 ) {
 
-      return SQLITE_ERROR;
+      return { SQLITE_IOERR, "Export empty or invalid." };
     }
 
     std::vector<char> converted( dump.get(), dump.get() + serializationSize );
-    std::cout << "serialsize " << serializationSize << std::endl;
     if ( converted.empty() ) {
 
-      return SQLITE_ERROR;
+      return { SQLITE_IOERR, "Export not convertable." };
     }
 
     // TODO(FB) Fehlerbehandlung und Exceptions - wenn ich es nicht schreiben kann? Wenn nicht genügend Platz vorhanden ist usw. usw.
-    std::cout << "output " << converted.size() << std::endl;
-    std::cout << "output " << converted.data() << std::endl;
     std::ofstream output( _filename, std::ios::out | std::ios::binary );
     output.write( converted.data(), static_cast<std::streamsize>( converted.size() ) );
     output.close();
 
-    return SQLITE_OK;
+    return {};
   }
 
   void distance( sqlite3_context *_context,
@@ -301,16 +269,16 @@ namespace vx::sqlite_utils {
       return;
     }
 
-//    NSString *text = [NSString stringWithUTF8String:( char * )sqlite3_value_text( argv[0] )];
-//    text = [text lowercaseString];
-//    text = [text stringByReplacingOccurrencesOfString:@"ß" withString:@"ss"];
+    //    NSString *text = [NSString stringWithUTF8String:( char * )sqlite3_value_text( argv[0] )];
+    //    text = [text lowercaseString];
+    //    text = [text stringByReplacingOccurrencesOfString:@"ß" withString:@"ss"];
     /* auch noch fehlerhaft geschriebene umlaute suchbar machen!!! */
-//    text = [text stringByReplacingOccurrencesOfString:@"ae" withString:@"a"];
-//    text = [text stringByReplacingOccurrencesOfString:@"oe" withString:@"o"];
-//    text = [text stringByReplacingOccurrencesOfString:@"ue" withString:@"u"];
-//    NSData *data = [text dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-//    text = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
-//    sqlite3_result_text( context, [text cStringUsingEncoding:NSASCIIStringEncoding], [text length], NULL );
+    //    text = [text stringByReplacingOccurrencesOfString:@"ae" withString:@"a"];
+    //    text = [text stringByReplacingOccurrencesOfString:@"oe" withString:@"o"];
+    //    text = [text stringByReplacingOccurrencesOfString:@"ue" withString:@"u"];
+    //    NSData *data = [text dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    //    text = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
+    //    sqlite3_result_text( context, [text cStringUsingEncoding:NSASCIIStringEncoding], [text length], NULL );
   }
 
   int output_callback( [[maybe_unused]] void *_data,

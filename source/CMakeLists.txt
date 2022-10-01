@@ -40,11 +40,11 @@ add_library(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
   PUBLIC
   ${PROJECT_SOURCE_DIR}
-#  ${SQLite4_INCLUDE_DIRS}
+  ${SQLite4_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
-  SQLite::SQLite3
-#  ${SQLite4_LIBRARIES}
+#  SQLite::SQLite3
+  ${SQLite4_LIBRARIES}
 )
