@@ -32,7 +32,3 @@ find_package(Threads REQUIRED)
 if(UNIX AND NOT APPLE)
   find_package(X11)
 endif()
-
-set(SQLite4_INCLUDE_DIRS "/usr/local/opt/sqlite3/include")
-set(SQLite4_LIBRARIES "/usr/local/opt/sqlite3/lib/libsqlite3.a")
-#find_package(SQLite3 REQUIRED)
