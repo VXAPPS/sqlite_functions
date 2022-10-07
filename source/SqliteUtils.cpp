@@ -160,10 +160,10 @@ namespace vx::sqlite_utils {
       return { SQLITE_IOERR, "Cannot read data from file." };
     }
 
-    std::shared_ptr<unsigned char> databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
-    std::memcpy( databuffer.get(), converted.data(), converted.size() );
+    auto databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
+    std::memcpy( databuffer, converted.data(), converted.size() );
 
-    const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer.get(), static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
+    const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
     if ( resultCode != SQLITE_OK ) {
 
 #ifdef DEBUG
