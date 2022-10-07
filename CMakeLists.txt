@@ -33,7 +33,11 @@ cmake_minimum_required(VERSION 3.18)
 project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES CXX)
 include(cmake/env.cmake)
 
+# External Project Dependencies
+include(${CMAKE}/external/sqlite.cmake)
+
 add_subdirectory(source)
+
 if(SQLITE_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()

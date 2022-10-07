@@ -36,6 +36,7 @@ option(SQLITE_BUILD_EXAMPLES "Build examples for sqlite_functions" ON)
 option(SQLITE_BUILD_TESTS "Build tests for sqlite_functions" OFF)
 
 # General
+set(CMAKE_TLS_VERIFY TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_compile_options("$<$<CONFIG:DEBUG>:-DDEBUG>")

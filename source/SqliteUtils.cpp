@@ -31,6 +31,7 @@
 /* c header */
 #include <cmath>
 #include <cstddef> // std::byte
+#include <cstring> // std::memcpy
 
 /* stl header */
 #include <filesystem>

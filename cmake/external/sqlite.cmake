@@ -28,21 +28,51 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-project(sqlite_functions)
+include(ExternalProject)
 
-add_library(${PROJECT_NAME}
-#  ../.github/workflows/integrate.yml
-  ../README.md
-  SqliteUtils.cpp
-  SqliteUtils.h
+set(SQLITE_SRC ${CMAKE_BINARY_DIR}/_deps/sqlite-src)
+set(SQLITE_INSTALL ${CMAKE_BINARY_DIR}/_deps/sqlite-install)
+if (UNIX)
+  set(SQLITE_LIBRARY ${SQLITE_INSTALL}/lib/libsqlite3.a)
+else()
+  set(SQLITE_LIBRARY ${SQLITE_INSTALL}/lib/sqlite3.lib)
+endif()
+set(SQLITE_INCLUDE_DIR ${SQLITE_INSTALL}/include)
+
+ExternalProject_Add(sqlite
+  SOURCE_DIR ${SQLITE_SRC}
+  URL https://sqlite.org/2022/sqlite-autoconf-3390400.tar.gz
+  URL_HASH SHA512=cc1de214e69ef677cac3f6dd2000ccfcf4b672ab464a115d96f24707009a408630e762c3cda89741b728ab34c4d9f5b8f8b12e9b11448e8364642b4421c3393d
+#  GIT_REPOSITORY https://github.com/sqlite/sqlite.git
+#  GIT_TAG version-3.39.4
+#  GIT_SHALLOW 1
+  USES_TERMINAL_DOWNLOAD FALSE
+  CONFIGURE_COMMAND
+    CC=${CMAKE_C_COMPILER}
+#    CFLAGS=${CMAKE_C_FLAGS}
+#    LDFLAGS=${CMAKE_STATIC_LINKER_FLAGS}
+#    LDFLAGS=ZLIB_DIR
+    ${SQLITE_SRC}/configure
+    -q #quite
+    --prefix=${SQLITE_INSTALL}
+    --enable-static=yes
+    --enable-shared=no
+    --enable-threadsafe=yes
+    --enable-debug=no
+#    --disable-largefile
+  BUILD_COMMAND make
+  TEST_COMMAND ""
+  INSTALL_COMMAND make install
+  INSTALL_DIR ${SQLITE_INSTALL}
+  BUILD_BYPRODUCTS ${SQLITE_LIBRARY}
+  UPDATE_COMMAND ""
 )
 
-target_include_directories(${PROJECT_NAME}
-  PUBLIC
-  ${PROJECT_SOURCE_DIR}
-)
+# nmake /f ..\sqlite\Makefile.msc TOP=.
 
-target_link_libraries(${PROJECT_NAME}
-  PUBLIC
-  SQLite::SQLite3
-)
+file(MAKE_DIRECTORY ${SQLITE_INCLUDE_DIR})
+
+add_library(SQLite::SQLite3 STATIC IMPORTED GLOBAL)
+set_property(TARGET SQLite::SQLite3 PROPERTY IMPORTED_LOCATION ${SQLITE_LIBRARY})
+set_property(TARGET SQLite::SQLite3 PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${SQLITE_INCLUDE_DIR})
+add_dependencies(SQLite::SQLite3 sqlite)
