@@ -130,9 +130,9 @@ namespace vx::sqlite_utils {
     return statement;
   }
 
-  std::tuple<int, std::string> import_dump( sqlite3 *_handle,
-                                            const std::string &_schema,
-                                            const std::string &_filename ) {
+  std::tuple<int, std::string> importDump( sqlite3 *_handle,
+                                           const std::string &_schema,
+                                           const std::string &_filename ) {
 
     if ( !std::filesystem::exists( _filename ) ) {
 
@@ -177,9 +177,9 @@ namespace vx::sqlite_utils {
     return {};
   }
 
-  std::tuple<int, std::string> export_dump( sqlite3 *_handle,
-                                            const std::string &_schema,
-                                            const std::string &_filename ) {
+  std::tuple<int, std::string> exportDump( sqlite3 *_handle,
+                                           const std::string &_schema,
+                                           const std::string &_filename ) {
 
     /* Dump database */
     sqlite3_int64 serializationSize = 0;
@@ -281,10 +281,10 @@ namespace vx::sqlite_utils {
     //    sqlite3_result_text( context, [text cStringUsingEncoding:NSASCIIStringEncoding], [text length], NULL );
   }
 
-  int output_callback( [[maybe_unused]] void *_data,
-                       int _argc,
-                       char **_argv,
-                       char **_columns ) {
+  int outputCallback( [[maybe_unused]] void *_data,
+                      int _argc,
+                      char **_argv,
+                      char **_columns ) {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
     const std::span args( _argv, static_cast<std::size_t>( _argc ) );

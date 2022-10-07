@@ -30,7 +30,7 @@
 
 cmake_minimum_required(VERSION 3.18)
 
-project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES CXX)
+project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES CXX)
 include(cmake/env.cmake)
 
 add_subdirectory(source)

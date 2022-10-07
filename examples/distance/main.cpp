@@ -175,7 +175,7 @@ int main() {
   }
 
 #ifdef DEBUG
-  resultCode = sqlite3_exec( database.get(), sql2Expect.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
+  resultCode = sqlite3_exec( database.get(), sql2Expect.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
@@ -187,7 +187,7 @@ int main() {
 #endif
 
   sql = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'New York'";
-  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
@@ -198,7 +198,7 @@ int main() {
   }
 
   sql = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'Tokyo'";
-  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;

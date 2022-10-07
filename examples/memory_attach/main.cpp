@@ -126,7 +126,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-//  vx::sqlite_utils::export_dump( database.get(), "main", "main_test.sqlite3" );
+//  vx::sqlite_utils::exportDump( database.get(), "main", "main_test.sqlite3" );
 
   /* SECOND DB */
   resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS second", nullptr, nullptr, nullptr );
@@ -142,7 +142,7 @@ int main() {
 
   if ( true ) {
 
-    auto [ resultCodeImport, resultMessageImport ] = vx::sqlite_utils::import_dump( database.get(), "second", "second_test.sqlite3" );
+    auto [ resultCodeImport, resultMessageImport ] = vx::sqlite_utils::importDump( database.get(), "second", "second_test.sqlite3" );
     std::cout << resultCodeImport << " " << resultMessageImport << std::endl;
   }
   else {
@@ -310,7 +310,7 @@ int main() {
 
   /* Overall SELECT */
   sql = "SELECT * FROM cities UNION ALL SELECT * FROM second.cities UNION ALL SELECT * FROM third.cities ORDER BY city"; // LIMIT 3, 3";
-  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
@@ -322,7 +322,7 @@ int main() {
   }
 
   sql = "PRAGMA database_list";
-  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::output_callback, nullptr, nullptr );
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
@@ -333,9 +333,9 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  vx::sqlite_utils::export_dump( database.get(), "main", "main_test.sqlite3" );
-  vx::sqlite_utils::export_dump( database.get(), "second", "second_test.sqlite3" );
-  vx::sqlite_utils::export_dump( database.get(), "third", "third_test.sqlite3" );
+  vx::sqlite_utils::exportDump( database.get(), "main", "main_test.sqlite3" );
+  vx::sqlite_utils::exportDump( database.get(), "second", "second_test.sqlite3" );
+  vx::sqlite_utils::exportDump( database.get(), "third", "third_test.sqlite3" );
 
   resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS forth", nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
@@ -348,7 +348,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-//  std::cout << vx::sqlite_utils::import_dump( database.get(), "forth", "second_test.sqlite3" ) << std::endl;
+//  std::cout << vx::sqlite_utils::importDump( database.get(), "forth", "second_test.sqlite3" ) << std::endl;
 
   return EXIT_SUCCESS;
 }
