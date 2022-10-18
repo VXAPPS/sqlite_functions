@@ -29,8 +29,10 @@
  */
 
 /* stl header */
+#include <codecvt>
 #include <fstream>
 #include <iostream>
+#include <locale>
 #include <memory>
 #include <vector>
 
@@ -62,9 +64,23 @@
  * Melbourne | -37.8136 |  144.9631
  */
 
-int main() {
+static std::wstring s2ws( const std::string &str ) {
 
-  std::cout << SQLITE_VERSION << std::endl;
+  using convert_typeX = std::codecvt_utf8<wchar_t>;
+  std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+  return converterX.from_bytes( str );
+}
+
+static std::string ws2s( const std::wstring &wstr ) {
+
+  using convert_typeX = std::codecvt_utf8<wchar_t>;
+  std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+  return converterX.to_bytes( wstr );
+}
+
+int main() {
 
   /* Open database */
   const std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
@@ -126,8 +142,6 @@ int main() {
     return EXIT_FAILURE;
   }
 
-//  vx::sqlite_utils::exportDump( database.get(), "main", "main_test.sqlite3" );
-
   /* SECOND DB */
   resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS second", nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
@@ -138,62 +152,6 @@ int main() {
     std::cout << "SQL: '" << sql << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
-  }
-
-  if ( true ) {
-
-    auto [ resultCodeImport, resultMessageImport ] = vx::sqlite_utils::importDump( database.get(), "second", "second_test.sqlite3" );
-    std::cout << resultCodeImport << " " << resultMessageImport << std::endl;
-  }
-  else {
-
-    const std::string _schema = "second";
-    const std::string _filename = "second_test.sqlite3";
-
-    std::vector<char> dump {};
-    std::ifstream input( _filename, std::ios::in | std::ios::binary );
-    if ( !input.eof() && !input.fail() ) {
-
-      input.seekg( 0, std::ios_base::end );
-      const std::streampos size = input.tellg();
-      std::cout << "input2 " << size << std::endl;
-      dump.resize( static_cast<std::size_t>( size ) );
-
-      input.seekg( 0, std::ios_base::beg );
-      input.read( dump.data(), size );
-    }
-    input.close();
-
-    std::cout << "input " << dump.size() << std::endl;
-    std::cout << "input " << dump.data() << std::endl;
-    std::vector<unsigned char> converted( std::begin( dump ), std::end( dump ) );
-    if ( converted.empty() ) {
-
-      return SQLITE_ERROR;
-    }
-    std::cout << "input neu " << converted.size() << std::endl;
-  //    std::vector<unsigned char> converted {};
-  //    std::copy(dump.begin(), dump.end(), std::back_inserter(converted));
-  //    std::streamoff fs = input.tellg();
-
-
-  //    input >> data.data();
-  //    input.close();
-
-    // copies all data into buffer
-  //    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), fs);
-  //    std::cout << "buffer " << buffer.size() << std::endl;
-
-    resultCode = sqlite3_deserialize( database.get(), _schema.c_str(), converted.data(), static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
-    if ( resultCode != SQLITE_OK ) {
-
-      std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
-      std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-      std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-      std::cout << "SQL: '" << sql << "'" << std::endl;
-      std::cout << std::endl;
-      return EXIT_FAILURE;
-    }
   }
 
   /* Create table */
@@ -308,6 +266,66 @@ int main() {
     return EXIT_FAILURE;
   }
 
+  sql = "INSERT INTO third.cities VALUES('イチゴ', -37.8136, 144.9631)"; // I chi go
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+  if ( resultCode != SQLITE_OK ) {
+
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "SQL: '" << sql << "'" << std::endl;
+    std::cout << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  sql = "INSERT INTO third.cities VALUES('チイゴ', -37.8136, 144.9631)"; // chi i go
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+  if ( resultCode != SQLITE_OK ) {
+
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "SQL: '" << sql << "'" << std::endl;
+    std::cout << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  //  _setmode(_fileno(stdout), _O_U8TEXT);
+
+  const std::string str = "ABCチイゴ";
+  std::cout << str << " " << str.length() << std::endl;
+  const std::wstring wstr = L"チイゴ";
+  std::wcout << wstr << " " << wstr.length() << std::endl;
+  const std::string str2 = ws2s( wstr );
+  std::cout << str2 << " " << str2.length() << std::endl;
+
+  const std::wstring wstr2 = s2ws( str );
+  std::wcout << wstr2 << " " << wstr2.length() << std::endl;
+
+  sql = "INSERT INTO third.cities VALUES('ゴチイ', -37.8136, 144.9631)"; // go chi i
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+  if ( resultCode != SQLITE_OK ) {
+
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "SQL: '" << sql << "'" << std::endl;
+    std::cout << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  sql = "INSERT INTO third.cities VALUES('说/説🧡', -37.8136, 144.9631)";
+  resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+  if ( resultCode != SQLITE_OK ) {
+
+    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
+    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "SQL: '" << sql << "'" << std::endl;
+    std::cout << std::endl;
+    return EXIT_FAILURE;
+  }
+
   /* Overall SELECT */
   sql = "SELECT * FROM cities UNION ALL SELECT * FROM second.cities UNION ALL SELECT * FROM third.cities ORDER BY city"; // LIMIT 3, 3";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
@@ -333,10 +351,6 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  vx::sqlite_utils::exportDump( database.get(), "main", "main_test.sqlite3" );
-  vx::sqlite_utils::exportDump( database.get(), "second", "second_test.sqlite3" );
-  vx::sqlite_utils::exportDump( database.get(), "third", "third_test.sqlite3" );
-
   resultCode = sqlite3_exec( database.get(), "ATTACH DATABASE ':memory:' AS forth", nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
@@ -347,8 +361,6 @@ int main() {
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
-
-//  std::cout << vx::sqlite_utils::importDump( database.get(), "forth", "second_test.sqlite3" ) << std::endl;
 
   return EXIT_SUCCESS;
 }

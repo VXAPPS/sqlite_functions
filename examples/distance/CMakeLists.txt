@@ -37,4 +37,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   sqlite_functions
+  ICU::uc
+  ICU::i18n
+  ICU::data
 )

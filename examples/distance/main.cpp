@@ -29,6 +29,7 @@
  */
 
 /* stl header */
+#include <codecvt>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -40,6 +41,9 @@
 /* sqlite_functions */
 #include <SqliteUtils.h>
 
+#include <unicode/translit.h>
+#include <unicode/unistr.h>
+
 /*
  * SQL DATA
  *      city | latitude | longitude
@@ -48,7 +52,41 @@
  * Tokyo     |  35.6839 |  139.7744
  */
 
+static std::string ws2s( const std::wstring &wstr ) {
+
+  using convert_typeX = std::codecvt_utf8<wchar_t>;
+  std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+  return converterX.to_bytes( wstr );
+}
+
 int main() {
+
+  using namespace icu_70;
+
+  UnicodeString data1 = UnicodeString::fromUTF8( StringPiece( "パイナップル" ) );
+  //UnicodeString data1 = UnicodeString::fromUTF8( StringPiece( "全角ひらがな" ) ); // full-width hiragana
+  //UnicodeString data1 = UnicodeString::fromUTF8( StringPiece( "全角カタカナ" ) ); // full-width katakana
+  //UnicodeString data1 = UnicodeString::fromUTF8( StringPiece( "半角ｶﾀｶﾅ" ) ); // half-width katakana
+
+  UErrorCode status = U_ZERO_ERROR;
+  Transliterator *myTrans = Transliterator::createInstance( "Any-Latin", // "Katakana-Latin", //"Hiragana-Latin",
+                                                            UTRANS_FORWARD, status );
+  myTrans->transliterate( data1 );
+
+  std::wstring ws;
+  for ( int i = 0; i < data1.length(); ++i ) {
+    ws += static_cast<wchar_t>( data1[ i ] );
+  }
+
+  std::cout << ws2s( ws ) << std::endl;
+
+  //  icu_70::Transliterator *transliterator = icu_70::Transliterator::createInstance( "Hiragana-Katakana" );
+  //  transliterator.transliterate(myString);
+
+  //  System.out.println(transliterator.transliterate(data1));
+  //  System.out.println(transliterator.transliterate(data2));
+  //  System.out.println(transliterator.transliterate(data3));
 
   /* Open database */
   const std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };

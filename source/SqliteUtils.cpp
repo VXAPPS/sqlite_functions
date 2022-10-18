@@ -172,6 +172,7 @@ namespace vx::sqlite_utils {
       std::cout << "ERROR: '" << sqlite3_errmsg( _handle ) << "'" << std::endl;
       std::cout << std::endl;
 #endif
+      //      return std::make_error_code( resultCode, SqliteErrorCategory() );
       return { resultCode, sqlite3_errmsg( _handle ) };
     }
 
