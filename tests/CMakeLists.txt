@@ -28,13 +28,36 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-project(distance)
+project(test_ascii)
 
 add_executable(${PROJECT_NAME}
-  main.cpp
+  ${PROJECT_NAME}.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   sqlite_functions
+  GTest::gtest_main
+  Threads::Threads
+)
+
+gtest_add_tests(${PROJECT_NAME}
+  SOURCES ${PROJECT_NAME}.cpp
+)
+
+project(test_distance)
+
+add_executable(${PROJECT_NAME}
+  ${PROJECT_NAME}.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}
+  PRIVATE
+  sqlite_functions
+  GTest::gtest_main
+  Threads::Threads
+)
+
+gtest_add_tests(${PROJECT_NAME}
+  SOURCES ${PROJECT_NAME}.cpp
 )

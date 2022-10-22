@@ -36,6 +36,7 @@
 /* stl header */
 #include <filesystem>
 #include <fstream>
+#include <numeric>
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
   #include <span>
 #endif
@@ -43,6 +44,13 @@
 
 /* sqlite header */
 #include <sqlite3.h>
+
+/* icu header */
+#include <unicode/translit.h>
+#include <unicode/unistr.h>
+
+/* modern.cpp.core */
+#include <StringUtils.h>
 
 /* local header */
 #include "SqliteUtils.h"
@@ -160,7 +168,7 @@ namespace vx::sqlite_utils {
       return { SQLITE_IOERR, "Cannot read data from file." };
     }
 
-    auto databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
+    auto *databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
     std::memcpy( databuffer, converted.data(), converted.size() );
 
     const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
@@ -256,6 +264,13 @@ namespace vx::sqlite_utils {
     sqlite3_result_double( _context, std::acos( sin( latitude1 / halfCircleDegree * M_PI ) * std::sin( latitude2 / halfCircleDegree * M_PI ) + std::cos( latitude1 / halfCircleDegree * M_PI ) * std::cos( latitude2 / halfCircleDegree * M_PI ) * std::cos( ( longitude2 / halfCircleDegree * M_PI ) - ( longitude1 / halfCircleDegree * M_PI ) ) ) * earthBlubKm );
   }
 
+  static std::string ws2s( const std::wstring &wstr ) {
+
+    using convert_typeX = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_typeX, wchar_t> converterX;
+    return converterX.to_bytes( wstr );
+  }
+
   void ascii( sqlite3_context *_context,
               int _argc,
               sqlite3_value **_argv ) {
@@ -271,16 +286,44 @@ namespace vx::sqlite_utils {
       return;
     }
 
-    //    NSString *text = [NSString stringWithUTF8String:( char * )sqlite3_value_text( argv[0] )];
-    //    text = [text lowercaseString];
-    //    text = [text stringByReplacingOccurrencesOfString:@"ß" withString:@"ss"];
-    /* auch noch fehlerhaft geschriebene umlaute suchbar machen!!! */
-    //    text = [text stringByReplacingOccurrencesOfString:@"ae" withString:@"a"];
-    //    text = [text stringByReplacingOccurrencesOfString:@"oe" withString:@"o"];
-    //    text = [text stringByReplacingOccurrencesOfString:@"ue" withString:@"u"];
-    //    NSData *data = [text dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    //    text = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
-    //    sqlite3_result_text( context, [text cStringUsingEncoding:NSASCIIStringEncoding], [text length], NULL );
+#if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
+    const std::optional input = string_utils::fromUnsignedChar( sqlite3_value_text( args[ 0 ] ) );
+#else
+    const std::optional input = string_utils::fromUnsignedChar( sqlite3_value_text( _argv[ 0 ] ) );
+#endif
+
+    const std::string delimiter = ";";
+    const auto join = [ &delimiter ]( const std::string &_str,
+                                      const std::string &_part ) {
+      return _str + ( _str.empty() ? std::string() : delimiter ) + _part;
+    };
+    const std::vector<std::string> transliteratorRules = { "Any-Latin", "[:Nonspacing Mark:] Remove", "[:Punctuation:] Remove", "[:Symbol:] Remove", "Latin-ASCII" };
+    const std::string result = std::accumulate( std::cbegin( transliteratorRules ), std::cend( transliteratorRules ), std::string(), join );
+
+    UErrorCode status = U_ZERO_ERROR;
+    std::unique_ptr<icu::Transliterator> transliterator { icu::Transliterator::createInstance( icu::UnicodeString::fromUTF8( icu::StringPiece( result ) ), UTRANS_FORWARD, status ) };
+    if ( U_FAILURE( status ) ) {
+
+      sqlite3_result_null( _context );
+      return;
+    }
+
+    icu::UnicodeString data = icu::UnicodeString::fromUTF8( icu::StringPiece( input.value_or( "" ) ) );
+    transliterator->transliterate( data );
+
+    std::wstring wstr {};
+    for ( int i = 0; i < data.length(); ++i ) {
+
+      wstr += static_cast<wchar_t>( data[ i ] );
+    }
+
+    std::string str = ws2s( wstr );
+    string_utils::toLower( str );
+    string_utils::simplified( str );
+
+    auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
+    std::memcpy( databuffer, str.data(), str.size() );
+    sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
   }
 
   int outputCallback( [[maybe_unused]] void *_data,

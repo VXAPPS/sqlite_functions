@@ -33,7 +33,7 @@ option(CMAKE_VERBOSE_MAKEFILE "Show the complete build commands" OFF)
 
 # possibility to disable build steps
 option(SQLITE_BUILD_EXAMPLES "Build examples for sqlite_functions" ON)
-option(SQLITE_BUILD_TESTS "Build tests for sqlite_functions" OFF)
+option(SQLITE_BUILD_TESTS "Build tests for sqlite_functions" ON)
 
 # General
 set(CMAKE_TLS_VERIFY TRUE)
@@ -125,3 +125,4 @@ set(CMAKE_MODULE_PATH ${CMAKE}/modules)
 include(${CMAKE}/create_package.cmake)
 include(${CMAKE}/doxygen.cmake)
 include(${CMAKE}/find_package.cmake)
+include(${CMAKE}/sanitizers.cmake)

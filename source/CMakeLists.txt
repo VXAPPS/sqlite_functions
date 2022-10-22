@@ -44,6 +44,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
+  modern.cpp.core
   SQLite::SQLite3
   ICU::uc
   ICU::i18n

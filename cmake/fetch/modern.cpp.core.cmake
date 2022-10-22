@@ -28,13 +28,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-project(distance)
+include(FetchContent)
 
-add_executable(${PROJECT_NAME}
-  main.cpp
+option(CORE_MASTER_PROJECT "Master project" OFF)
+option(CORE_BUILD_EXAMPLES "Build examples" OFF)
+option(CORE_BUILD_TESTS "Build tests" OFF)
+
+FetchContent_Declare(
+  modern.cpp.core
+  GIT_REPOSITORY https://github.com/VXAPPS/modern.cpp.core.git
+  GIT_TAG master
+  GIT_SHALLOW 1
 )
 
-target_link_libraries(${PROJECT_NAME}
-  PRIVATE
-  sqlite_functions
-)
+FetchContent_MakeAvailable(modern.cpp.core)
