@@ -83,7 +83,7 @@ static std::string ws2s( const std::wstring &wstr ) {
 int main() {
 
   /* Open database */
-  const std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
   if ( !database ) {
 
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;

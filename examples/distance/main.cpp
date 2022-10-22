@@ -56,7 +56,7 @@
 int main() {
 
   /* Open database */
-  const std::unique_ptr<sqlite3, vx::sqlite_utils::sqlite3_deleter> database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
   if ( !database ) {
 
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
@@ -129,7 +129,7 @@ int main() {
 #endif
 
   sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Munich'";
-  const std::unique_ptr<sqlite3_stmt, vx::sqlite_utils::sqlite3_stmt_deleter> statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+  const auto statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
   resultCode = sqlite3_bind_double( statement.get(), 1, latitude );
   if ( resultCode != SQLITE_OK ) {
 
@@ -150,7 +150,7 @@ int main() {
   }
 
 #ifdef DEBUG
-  if ( const std::string expandedSql = sqlite3_expanded_sql( statement.get() ); sql2Expect != expandedSql ) {
+  if ( const std::unique_ptr<char, vx::sqlite_utils::sqlite3_str_deleter> expandedSql { sqlite3_expanded_sql( statement.get() ) }; sql2Expect != expandedSql.get() ) {
 
     std::cout << "RESULT AFTER BIND MISMATCH" << std::endl;
     std::cout << "EXPECT: '" << sql2Expect << "'" << std::endl;

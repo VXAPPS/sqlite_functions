@@ -71,7 +71,7 @@ namespace vx {
   TEST( Distance, Calc ) {
 
     /* Open database */
-    const std::unique_ptr<sqlite3, sqlite_utils::sqlite3_deleter> database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
     if ( !database ) {
 
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
