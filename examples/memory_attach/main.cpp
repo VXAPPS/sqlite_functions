@@ -108,7 +108,6 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << std::endl;
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
     std::cout << "SQL: '" << sql << "'" << std::endl;
