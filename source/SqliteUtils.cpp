@@ -142,16 +142,20 @@ namespace vx::sqlite_utils {
 
   std::tuple<int, std::string> importDump( sqlite3 *_handle,
                                            const std::string &_schema,
-                                           const std::string &_filename ) {
+                                           const std::string &_filename ) noexcept {
 
-    if ( !std::filesystem::exists( _filename ) ) {
+    std::error_code errorCode {};
+    if ( !std::filesystem::exists( _filename, errorCode ) || errorCode ) {
 
-      return { SQLITE_OK, "File not found." };
+      return { SQLITE_IOERR, "File not found." };
     }
 
-    // TODO(FB) Fehlerbehandlung und Exceptions - wenn ich es nicht schreiben kann? Wenn nicht genügend Platz vorhanden ist usw. usw.
     std::vector<char> dump {};
     std::ifstream input( _filename, std::ios::in | std::ios::binary );
+    if ( !input.is_open() ) {
+
+      return { SQLITE_IOERR, "Cannot open file for import." };
+    }
     if ( !input.eof() && !input.fail() ) {
 
       input.seekg( 0, std::ios_base::end );
@@ -161,7 +165,15 @@ namespace vx::sqlite_utils {
       input.seekg( 0, std::ios_base::beg );
       input.read( dump.data(), size );
     }
-    input.close();
+    try {
+
+      input.close();
+    }
+    catch ( const std::ofstream::failure &_exception ) {
+
+      std::cout << _exception.what() << std::endl;
+      return { SQLITE_IOERR, "Unable to close the import file." };
+    }
 
     std::vector<unsigned char> converted( std::begin( dump ), std::end( dump ) );
     if ( converted.empty() ) {
@@ -175,12 +187,10 @@ namespace vx::sqlite_utils {
     if ( const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE ); resultCode != SQLITE_OK ) {
 
 #ifdef DEBUG
-      std::cout << __PRETTY_FUNCTION__ << std::endl;
       std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
       std::cout << "ERROR: '" << sqlite3_errmsg( _handle ) << "'" << std::endl;
       std::cout << std::endl;
 #endif
-      //      return std::make_error_code( resultCode, SqliteErrorCategory() );
       return { resultCode, sqlite3_errmsg( _handle ) };
     }
 
@@ -189,7 +199,7 @@ namespace vx::sqlite_utils {
 
   std::tuple<int, std::string> exportDump( sqlite3 *_handle,
                                            const std::string &_schema,
-                                           const std::string &_filename ) {
+                                           const std::string &_filename ) noexcept {
 
     /* Dump database */
     sqlite3_int64 serializationSize = 0;
@@ -205,10 +215,21 @@ namespace vx::sqlite_utils {
       return { SQLITE_IOERR, "Export not convertable." };
     }
 
-    // TODO(FB) Fehlerbehandlung und Exceptions - wenn ich es nicht schreiben kann? Wenn nicht genügend Platz vorhanden ist usw. usw.
     std::ofstream output( _filename, std::ios::out | std::ios::binary );
-    output.write( converted.data(), static_cast<std::streamsize>( converted.size() ) );
-    output.close();
+    if ( !output.is_open() ) {
+
+      return { SQLITE_IOERR, "Cannot open file for export." };
+    }
+    try {
+
+      output.write( converted.data(), static_cast<std::streamsize>( converted.size() ) );
+      output.close();
+    }
+    catch ( const std::ofstream::failure &_exception ) {
+
+      std::cout << _exception.what() << std::endl;
+      return { SQLITE_IOERR, "Unable to write or close the export file." };
+    }
 
     return {};
   }
@@ -297,7 +318,11 @@ namespace vx::sqlite_utils {
                                       const std::string &_part ) {
       return _str + ( _str.empty() ? std::string() : delimiter ) + _part;
     };
-    const std::vector<std::string> transliteratorRules = { "Any-Latin", "[:Nonspacing Mark:] Remove", "[:Punctuation:] Remove", "[:Symbol:] Remove", "Latin-ASCII" };
+    const std::vector<std::string> transliteratorRules = { "Any-Latin",
+                                                           "[:Nonspacing Mark:] Remove",
+                                                           "[:Punctuation:] Remove",
+                                                           "[:Symbol:] Remove",
+                                                           "Latin-ASCII" };
     const std::string result = std::accumulate( std::cbegin( transliteratorRules ), std::cend( transliteratorRules ), std::string(), join );
 
     UErrorCode status = U_ZERO_ERROR;
@@ -323,6 +348,7 @@ namespace vx::sqlite_utils {
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
     std::memcpy( databuffer, str.data(), str.size() );
+
     sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
   }
 

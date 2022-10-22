@@ -158,8 +158,89 @@ namespace vx {
     EXPECT_EQ( asciiListOrdered, expected );
   }
 
-  // TEST( Ascii, Search ) {
-  // }
+  TEST( Ascii, Search ) {
+
+    /* Open database */
+    const std::unique_ptr<sqlite3, sqlite_utils::sqlite3_deleter> database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+    if ( !database ) {
+
+      GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
+    }
+
+    int resultCode = sqlite3_create_function_v2( database.get(), "ascii", 1, SQLITE_UTF8, nullptr, &sqlite_utils::ascii, nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
+    }
+
+    /* Create table */
+    std::string sql = "CREATE TABLE mixed (name STRING, note STRING)";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    /* Insert data */
+    sql = "INSERT INTO mixed VALUES('Игорь Фёдорович Стравинский','Igor'' Fëdorovič Stravinskij')";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    sql = "INSERT INTO mixed VALUES('宮崎 駿','Hayao Miyazaki')";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    sql = "INSERT INTO mixed VALUES('艾未未','Ai Weiwei')";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    sql = "INSERT INTO mixed VALUES('오미주','Sandra Oh')";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    sql = "INSERT INTO mixed VALUES('パイナップル','Ananas')";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    sql = "INSERT INTO mixed VALUES('Albert Einstein','Albert Einstein')";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    /* SELECT */
+    sql = "SELECT ASCII(name) AS ascii FROM mixed WHERE ascii LIKE '%ei%' ORDER BY ascii";
+    std::vector<std::string> asciiListOrdered {};
+    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+    while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
+
+      std::optional ascii = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) );
+      asciiListOrdered.emplace_back( ascii.value_or( "" ) );
+    }
+    if ( resultCode != SQLITE_DONE ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
+    std::vector<std::string> expected = { "ai wei wei", "albert einstein" };
+    EXPECT_EQ( asciiListOrdered, expected );
+  }
 }
 #ifdef __clang__
   #pragma clang diagnostic pop
