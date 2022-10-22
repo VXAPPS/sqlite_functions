@@ -120,7 +120,7 @@ int main() {
   }
 
   /* Calculate a distance from select */
-  /* std::string city = "Berlin"; */
+  /* std::string city = "Berlin"; */ // NOSONAR Alternative code
   constexpr double latitude = 52.5167;
   constexpr double longitude = 13.3833;
 
@@ -150,8 +150,7 @@ int main() {
   }
 
 #ifdef DEBUG
-  const std::string expandedSql = sqlite3_expanded_sql( statement.get() );
-  if ( sql2Expect != expandedSql ) {
+  if ( const std::string expandedSql = sqlite3_expanded_sql( statement.get() ); sql2Expect != expandedSql ) {
 
     std::cout << "RESULT AFTER BIND MISMATCH" << std::endl;
     std::cout << "EXPECT: '" << sql2Expect << "'" << std::endl;
@@ -164,7 +163,7 @@ int main() {
 
     const double distance = sqlite3_column_double( statement.get(), 0 );
     /* Everything inside sqlite3 is handled as text! */
-    /* std::string distance = reinterpret_cast<const char *>( sqlite3_column_text( statement.get(), 0 ) ); */
+    /* std::optional distance = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) ); */ // NOSONAR Alternative code
     /* Begin to print out the complete double precision! - this is just needed once! */
     std::cout << std::setprecision( std::numeric_limits<double>::digits10 ) << std::endl;
     std::cout << sqlite3_column_name( statement.get(), 0 ) << " = " << distance << std::endl;

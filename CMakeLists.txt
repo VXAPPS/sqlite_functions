@@ -48,13 +48,9 @@ endif()
 
 # External Project Dependencies
 include(${CMAKE}/external/sqlite.cmake)
-#include(${CMAKE}/external/re2.cmake)
 add_subdirectory(source)
 
 if(SQLITE_MASTER_PROJECT)
-#  if(NOT HAVE_FORMAT)
-#    include(${CMAKE}/external/fmt.cmake)
-#  endif()
   if(SQLITE_BUILD_EXAMPLES)
     add_subdirectory(examples)
   endif()

@@ -34,6 +34,7 @@
 #include <cstring> // std::memcpy
 
 /* stl header */
+#include <codecvt>
 #include <filesystem>
 #include <fstream>
 #include <numeric>
@@ -93,7 +94,7 @@ namespace vx::sqlite_utils {
 #endif
   }
 
-  void sqlite3_generic_deleter::operator()( void *_what ) const {
+  void sqlite3_generic_deleter::operator()( void *_what ) const { // NOSONAR more meaningful than void
 
     sqlite3_free( _what );
   }
@@ -171,8 +172,7 @@ namespace vx::sqlite_utils {
     auto *databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
     std::memcpy( databuffer, converted.data(), converted.size() );
 
-    const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE );
-    if ( resultCode != SQLITE_OK ) {
+    if ( const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE ); resultCode != SQLITE_OK ) {
 
 #ifdef DEBUG
       std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -326,7 +326,7 @@ namespace vx::sqlite_utils {
     sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
   }
 
-  int outputCallback( [[maybe_unused]] void *_data,
+  int outputCallback( [[maybe_unused]] void *_data, // NOSONAR more meaningful than void
                       int _argc,
                       char **_argv,
                       char **_columns ) {

@@ -114,7 +114,7 @@ namespace vx {
     }
 
     /* Calculate a distance from select */
-    /* std::string city = "Berlin"; */
+    /* std::string city = "Berlin"; */ // NOSONAR Alternative code.
     constexpr double latitude = 52.5167;
     constexpr double longitude = 13.3833;
 

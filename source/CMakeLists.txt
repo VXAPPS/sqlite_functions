@@ -48,5 +48,4 @@ target_link_libraries(${PROJECT_NAME}
   SQLite::SQLite3
   ICU::uc
   ICU::i18n
-  ICU::data
 )
