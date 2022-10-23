@@ -64,22 +64,6 @@
  * Melbourne | -37.8136 |  144.9631
  */
 
-static std::wstring s2ws( const std::string &str ) {
-
-  using convert_typeX = std::codecvt_utf8<wchar_t>;
-  std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-  return converterX.from_bytes( str );
-}
-
-static std::string ws2s( const std::wstring &wstr ) {
-
-  using convert_typeX = std::codecvt_utf8<wchar_t>;
-  std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-  return converterX.to_bytes( wstr );
-}
-
 int main() {
 
   /* Open database */
@@ -272,18 +256,6 @@ int main() {
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
-
-  //  _setmode(_fileno(stdout), _O_U8TEXT);
-
-  const std::string str = "ABCチイゴ";
-  std::cout << str << " " << str.length() << std::endl;
-  const std::wstring wstr = L"チイゴ";
-  std::wcout << wstr << " " << wstr.length() << std::endl;
-  const std::string str2 = ws2s( wstr );
-  std::cout << str2 << " " << str2.length() << std::endl;
-
-  const std::wstring wstr2 = s2ws( str );
-  std::wcout << wstr2 << " " << wstr2.length() << std::endl;
 
   sql = "INSERT INTO third.cities VALUES('ゴチイ', -37.8136, 144.9631)"; // go chi i
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );

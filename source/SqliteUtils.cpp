@@ -56,11 +56,6 @@
 /* local header */
 #include "SqliteUtils.h"
 
-/*namespace std {
-
-  enum class byte : unsigned char {} ;
-} */
-
 namespace vx::sqlite_utils {
 
   constexpr int halfCircleDegree = 180;
@@ -144,8 +139,7 @@ namespace vx::sqlite_utils {
                                            const std::string &_schema,
                                            const std::string &_filename ) noexcept {
 
-    std::error_code errorCode {};
-    if ( !std::filesystem::exists( _filename, errorCode ) || errorCode ) {
+    if ( std::error_code errorCode {}; !std::filesystem::exists( _filename, errorCode ) || errorCode ) {
 
       return { SQLITE_IOERR, "File not found." };
     }
