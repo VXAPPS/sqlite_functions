@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-project(test_ascii)
+project(test_distance)
 
 add_executable(${PROJECT_NAME}
   ${PROJECT_NAME}.cpp
@@ -45,7 +45,7 @@ gtest_add_tests(${PROJECT_NAME}
   SOURCES ${PROJECT_NAME}.cpp
 )
 
-project(test_distance)
+project(test_transliteration)
 
 add_executable(${PROJECT_NAME}
   ${PROJECT_NAME}.cpp

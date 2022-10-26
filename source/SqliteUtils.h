@@ -95,9 +95,9 @@ namespace vx::sqlite_utils {
                  int _argc,
                  sqlite3_value **_argv );
 
-  void ascii( sqlite3_context *_context,
-              int _argc,
-              sqlite3_value **_argv );
+  void transliteration( sqlite3_context *_context,
+                        int _argc,
+                        sqlite3_value **_argv );
 
   int outputCallback( void *_data,
                       int _argc,

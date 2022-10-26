@@ -74,7 +74,7 @@ namespace vx {
    * Albert Einstein
    */
 
-  TEST( Ascii, OrderBy ) {
+  TEST( Transliteration, OrderBy ) {
 
     /* Open database */
     const auto database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
@@ -83,7 +83,7 @@ namespace vx {
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
     }
 
-    int resultCode = sqlite3_create_function_v2( database.get(), "ascii", 1, SQLITE_UTF8, nullptr, &sqlite_utils::ascii, nullptr, nullptr, nullptr );
+    int resultCode = sqlite3_create_function_v2( database.get(), "transliteration", 1, SQLITE_UTF8, nullptr, &sqlite_utils::transliteration, nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
@@ -141,7 +141,7 @@ namespace vx {
     }
 
     /* SELECT */
-    sql = "SELECT ASCII(name) AS ascii FROM mixed ORDER BY ascii";
+    sql = "SELECT LOWER(TRANSLITERATION(name)) AS transliterated FROM mixed ORDER BY transliterated";
     std::vector<std::string> asciiListOrdered {};
     const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
@@ -158,7 +158,7 @@ namespace vx {
     EXPECT_EQ( asciiListOrdered, expected );
   }
 
-  TEST( Ascii, Search ) {
+  TEST( Transliteration, Search ) {
 
     /* Open database */
     const auto database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
@@ -167,7 +167,7 @@ namespace vx {
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
     }
 
-    int resultCode = sqlite3_create_function_v2( database.get(), "ascii", 1, SQLITE_UTF8, nullptr, &sqlite_utils::ascii, nullptr, nullptr, nullptr );
+    int resultCode = sqlite3_create_function_v2( database.get(), "transliteration", 1, SQLITE_UTF8, nullptr, &sqlite_utils::transliteration, nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
@@ -225,7 +225,7 @@ namespace vx {
     }
 
     /* SELECT */
-    sql = "SELECT ASCII(name) AS ascii FROM mixed WHERE ascii LIKE '%ei%' ORDER BY ascii";
+    sql = "SELECT LOWER(TRANSLITERATION(name)) AS transliterated FROM mixed WHERE transliterated LIKE '%ei%' ORDER BY transliterated";
     std::vector<std::string> asciiListOrdered {};
     const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {

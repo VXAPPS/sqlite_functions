@@ -134,7 +134,7 @@ namespace vx {
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
       const double distance = sqlite3_column_double( statement.get(), 0 );
-      EXPECT_EQ( distance, 504.100899610037 );
+      EXPECT_EQ( distance, 504.1008996100281 );
     }
     if ( resultCode != SQLITE_DONE ) {
 

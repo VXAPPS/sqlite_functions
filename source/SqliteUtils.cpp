@@ -286,9 +286,9 @@ namespace vx::sqlite_utils {
     return converterX.to_bytes( wstr );
   }
 
-  void ascii( sqlite3_context *_context,
-              int _argc,
-              sqlite3_value **_argv ) {
+  void transliteration( sqlite3_context *_context,
+                        int _argc,
+                        sqlite3_value **_argv ) {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
     const std::span args( _argv, static_cast<std::size_t>( _argc ) );
@@ -337,7 +337,6 @@ namespace vx::sqlite_utils {
     }
 
     std::string str = ws2s( wstr );
-    string_utils::toLower( str );
     string_utils::simplified( str );
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
