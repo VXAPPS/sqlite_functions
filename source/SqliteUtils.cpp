@@ -34,7 +34,6 @@
 #include <cstring> // std::memcpy
 
 /* stl header */
-#include <codecvt>
 #include <filesystem>
 #include <fstream>
 #include <numeric>
@@ -279,13 +278,6 @@ namespace vx::sqlite_utils {
     sqlite3_result_double( _context, std::acos( sin( latitude1 / halfCircleDegree * M_PI ) * std::sin( latitude2 / halfCircleDegree * M_PI ) + std::cos( latitude1 / halfCircleDegree * M_PI ) * std::cos( latitude2 / halfCircleDegree * M_PI ) * std::cos( ( longitude2 / halfCircleDegree * M_PI ) - ( longitude1 / halfCircleDegree * M_PI ) ) ) * earthBlubKm );
   }
 
-  static std::string ws2s( const std::wstring &wstr ) {
-
-    using convert_typeX = std::codecvt_utf8<wchar_t>;
-    std::wstring_convert<convert_typeX, wchar_t> converterX;
-    return converterX.to_bytes( wstr );
-  }
-
   void transliteration( sqlite3_context *_context,
                         int _argc,
                         sqlite3_value **_argv ) {
@@ -330,13 +322,8 @@ namespace vx::sqlite_utils {
     icu::UnicodeString data = icu::UnicodeString::fromUTF8( icu::StringPiece( input.value_or( "" ) ) );
     transliterator->transliterate( data );
 
-    std::wstring wstr {};
-    for ( int i = 0; i < data.length(); ++i ) {
-
-      wstr += static_cast<wchar_t>( data[ i ] );
-    }
-
-    std::string str = ws2s( wstr );
+    std::string str {};
+    data.toUTF8String( str );
     string_utils::simplified( str );
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
