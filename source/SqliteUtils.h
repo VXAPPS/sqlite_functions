@@ -31,7 +31,6 @@
 #pragma once
 
 /* stl header */
-#include <iostream>
 #include <memory>
 #include <string>
 
@@ -46,61 +45,131 @@ struct sqlite3_value;
  */
 namespace vx::sqlite_utils {
 
+  /**
+   * @brief The Result enum.
+   */
   enum class Result {
 
-    Code,
-    Message
+    Code,   /**< Result code. */
+    Message /**< Result message. */
   };
 
+  /**
+   * @brief The sqlite3_deleter class.
+   */
   struct sqlite3_deleter {
 
+    /**
+     * @brief Sqlite3 operator ().
+     * @param _handle   To sqlite3_close.
+     */
     void operator()( sqlite3 *_handle ) const;
   };
 
+  /**
+   * @brief The sqlite3_stmt_deleter class.
+   */
   struct sqlite3_stmt_deleter {
 
+    /**
+     * @brief Sqlite3 statement operator ().
+     * @param _statement   To sqlite3_finalize.
+     */
     void operator()( sqlite3_stmt *_statement ) const;
   };
 
+  /**
+   * @brief The sqlite3_generic_deleter class.
+   */
   struct sqlite3_generic_deleter {
 
+    /**
+     * @brief Sqlite3 generic operator ().
+     * @param _what   To sqlite3_free.
+     */
     void operator()( void *_what ) const;
   };
 
+  /**
+   * @brief The sqlite3_str_deleter class.
+   */
   struct sqlite3_str_deleter {
 
+    /**
+     * @brief Sqlite3 string operator ().
+     * @param _what   To sqlite3_free.
+     */
     void operator()( char *_what ) const;
   };
 
+  /**
+   * @brief Create sqlite3_open unique pointer.
+   * @param _filename   Database filename.
+   * @return Unique pointer for sqlite3 handle.
+   */
   std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename );
 
+  /**
+   * @brief Create sqlite3_stmt unique pointer.
+   * @param _handle   Database handle.
+   * @param _sql   Sql command.
+   * @return Unique pointer for sqlite3_stmt.
+   */
   std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_handle,
                                                                                 const std::string &_sql );
 
+  /**
+   * @brief Import sql dump.
+   * @param _handle   Database handle.
+   * @param _schema   Import shema - default is main.
+   * @param _filename   Database filename.
+   * @return Result code and message of operation.
+   */
   std::tuple<int, std::string> importDump( sqlite3 *_handle,
                                            const std::string &_schema,
                                            const std::string &_filename ) noexcept;
 
+  /**
+   * @brief Export sql dump.
+   * @param _handle   Database handle.
+   * @param _schema   Export shema - default is main.
+   * @param _filename   Database filename.
+   * @return Result code and message of operation.
+   */
   std::tuple<int, std::string> exportDump( sqlite3 *_handle,
                                            const std::string &_schema,
                                            const std::string &_filename ) noexcept;
 
   /**
-   * @brief Calculate the distance inside sql command.
+   * @brief Calculate the location distance as sql command.
    * @param _context   SQLite3 context.
    * @param _argc   Args size.
    * @param _argv   Args array.
    */
   void distance( sqlite3_context *_context,
                  int _argc,
-                 sqlite3_value **_argv );
+                 sqlite3_value **_argv ) noexcept;
 
+  /**
+   * @brief Transliteration as sql command.
+   * @param _context   SQLite3 context.
+   * @param _argc   Args size.
+   * @param _argv   Args array.
+   */
   void transliteration( sqlite3_context *_context,
                         int _argc,
-                        sqlite3_value **_argv );
+                        sqlite3_value **_argv ) noexcept;
 
+  /**
+   * @brief Output callback for sql command.
+   * @param _data   Incoming data.
+   * @param _argc   Args size.
+   * @param _argv   Args array.
+   * @param _columns   Column names.
+   * @return Result code.
+   */
   int outputCallback( void *_data,
                       int _argc,
                       char **_argv,
-                      char **_columns );
+                      char **_columns ) noexcept;
 }

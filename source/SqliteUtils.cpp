@@ -36,6 +36,7 @@
 /* stl header */
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <numeric>
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
   #include <span>
@@ -67,7 +68,6 @@ namespace vx::sqlite_utils {
 #ifdef DEBUG
     if ( resultCode != SQLITE_OK ) {
 
-      std::cout << __PRETTY_FUNCTION__ << std::endl;
       std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
       std::cout << "ERROR: '" << sqlite3_errmsg( _handle ) << "'" << std::endl;
       std::cout << std::endl;
@@ -81,7 +81,6 @@ namespace vx::sqlite_utils {
 #ifdef DEBUG
     if ( resultCode != SQLITE_OK ) {
 
-      std::cout << __PRETTY_FUNCTION__ << std::endl;
       std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
       std::cout << std::endl;
     }
@@ -106,7 +105,6 @@ namespace vx::sqlite_utils {
     if ( resultCode != SQLITE_OK ) {
 
 #ifdef DEBUG
-      std::cout << __PRETTY_FUNCTION__ << std::endl;
       std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
       std::cout << "ERROR: '" << sqlite3_errmsg( databaseHandle ) << "'" << std::endl;
       std::cout << std::endl;
@@ -125,7 +123,6 @@ namespace vx::sqlite_utils {
     if ( resultCode != SQLITE_OK ) {
 
 #ifdef DEBUG
-      std::cout << __PRETTY_FUNCTION__ << std::endl;
       std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
       std::cout << std::endl;
 #endif
@@ -179,11 +176,6 @@ namespace vx::sqlite_utils {
 
     if ( const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE ); resultCode != SQLITE_OK ) {
 
-#ifdef DEBUG
-      std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-      std::cout << "ERROR: '" << sqlite3_errmsg( _handle ) << "'" << std::endl;
-      std::cout << std::endl;
-#endif
       return { resultCode, sqlite3_errmsg( _handle ) };
     }
 
@@ -229,7 +221,7 @@ namespace vx::sqlite_utils {
 
   void distance( sqlite3_context *_context,
                  int _argc,
-                 sqlite3_value **_argv ) {
+                 sqlite3_value **_argv ) noexcept {
 
     /* Parameter count mismatch */
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
@@ -239,6 +231,9 @@ namespace vx::sqlite_utils {
     if ( _argc != 4 ) {
 #endif
 
+#ifdef DEBUG
+      std::cout << "DISTANCE: Parameter mismatch." << std::endl;
+#endif
       sqlite3_result_null( _context );
       return;
     }
@@ -249,6 +244,9 @@ namespace vx::sqlite_utils {
 
       if ( sqlite3_value_type( arg ) == SQLITE_NULL ) {
 
+  #ifdef DEBUG
+        std::cout << "DISTANCE: Parameter mismatch." << std::endl;
+  #endif
         sqlite3_result_null( _context );
         return;
       }
@@ -280,7 +278,7 @@ namespace vx::sqlite_utils {
 
   void transliteration( sqlite3_context *_context,
                         int _argc,
-                        sqlite3_value **_argv ) {
+                        sqlite3_value **_argv ) noexcept {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
     const std::span args( _argv, static_cast<std::size_t>( _argc ) );
@@ -289,6 +287,9 @@ namespace vx::sqlite_utils {
     if ( _argc != 1 && ( sqlite3_value_type( _argv[ 0 ] ) == SQLITE_NULL ) ) {
 #endif
 
+#ifdef DEBUG
+      std::cout << "TRANSLITERATION: Parameter mismatch." << std::endl;
+#endif
       sqlite3_result_null( _context );
       return;
     }
@@ -315,6 +316,9 @@ namespace vx::sqlite_utils {
     std::unique_ptr<icu::Transliterator> transliterator { icu::Transliterator::createInstance( icu::UnicodeString::fromUTF8( icu::StringPiece( result ) ), UTRANS_FORWARD, status ) };
     if ( U_FAILURE( status ) ) {
 
+#ifdef DEBUG
+      std::cout << "TRANSLITERATION: Cannot create transliterator." << std::endl;
+#endif
       sqlite3_result_null( _context );
       return;
     }
@@ -327,7 +331,7 @@ namespace vx::sqlite_utils {
     string_utils::simplified( str );
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
-    std::memcpy( databuffer, str.data(), str.size() );
+    std::strncpy( databuffer, str.data(), str.size() );
 
     sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
   }
@@ -335,7 +339,7 @@ namespace vx::sqlite_utils {
   int outputCallback( [[maybe_unused]] void *_data, // NOSONAR more meaningful than void
                       int _argc,
                       char **_argv,
-                      char **_columns ) {
+                      char **_columns ) noexcept {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
     const std::span args( _argv, static_cast<std::size_t>( _argc ) );

@@ -146,7 +146,7 @@ namespace vx {
     const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
-      std::optional ascii = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) );
+      const std::optional ascii = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) );
       asciiListOrdered.emplace_back( ascii.value_or( "" ) );
     }
     if ( resultCode != SQLITE_DONE ) {
@@ -230,7 +230,7 @@ namespace vx {
     const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
-      std::optional ascii = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) );
+      const std::optional ascii = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) );
       asciiListOrdered.emplace_back( ascii.value_or( "" ) );
     }
     if ( resultCode != SQLITE_DONE ) {
