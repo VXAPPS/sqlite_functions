@@ -77,7 +77,8 @@ namespace vx {
   TEST( Transliteration, OrderBy ) {
 
     /* Open database */
-    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+    std::error_code error_code {};
+    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:", error_code ) };
     if ( !database ) {
 
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
@@ -143,7 +144,7 @@ namespace vx {
     /* SELECT */
     sql = "SELECT LOWER(TRANSLITERATION(name)) AS transliterated FROM mixed ORDER BY transliterated";
     std::vector<std::string> asciiListOrdered {};
-    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error_code );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
       const std::optional ascii = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) );
@@ -161,7 +162,8 @@ namespace vx {
   TEST( Transliteration, Search ) {
 
     /* Open database */
-    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+    std::error_code error_code {};
+    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:", error_code ) };
     if ( !database ) {
 
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
@@ -227,7 +229,7 @@ namespace vx {
     /* SELECT */
     sql = "SELECT LOWER(TRANSLITERATION(name)) AS transliterated FROM mixed WHERE transliterated LIKE '%ei%' ORDER BY transliterated";
     std::vector<std::string> asciiListOrdered {};
-    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error_code );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
       const std::optional ascii = string_utils::fromUnsignedChar( sqlite3_column_text( statement.get(), 0 ) );

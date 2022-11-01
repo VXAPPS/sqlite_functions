@@ -71,7 +71,8 @@ namespace vx {
   TEST( Distance, Calc ) {
 
     /* Open database */
-    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:" ) };
+    std::error_code error_code {};
+    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:", error_code ) };
     if ( !database ) {
 
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
@@ -119,7 +120,7 @@ namespace vx {
     constexpr double longitude = 13.3833;
 
     sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Munich'";
-    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error_code );
     resultCode = sqlite3_bind_double( statement.get(), 1, latitude );
     if ( resultCode != SQLITE_OK ) {
 
@@ -142,7 +143,7 @@ namespace vx {
     }
 
     sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'New York'";
-    const auto statementNY = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+    const auto statementNY = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error_code );
     resultCode = sqlite3_bind_double( statementNY.get(), 1, latitude );
     if ( resultCode != SQLITE_OK ) {
 
@@ -165,7 +166,7 @@ namespace vx {
     }
 
     sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Tokyo'";
-    const auto statementT = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql );
+    const auto statementT = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error_code );
     resultCode = sqlite3_bind_double( statementT.get(), 1, latitude );
     if ( resultCode != SQLITE_OK ) {
 

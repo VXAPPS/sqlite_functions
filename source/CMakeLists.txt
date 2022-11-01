@@ -33,6 +33,7 @@ project(sqlite_functions)
 add_library(${PROJECT_NAME}
 #  ../.github/workflows/integrate.yml
   ../README.md
+  SqliteError.h
   SqliteUtils.cpp
   SqliteUtils.h
 )

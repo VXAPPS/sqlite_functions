@@ -54,6 +54,7 @@
 #include <StringUtils.h>
 
 /* local header */
+#include "SqliteError.h"
 #include "SqliteUtils.h"
 
 namespace vx::sqlite_utils {
@@ -97,33 +98,58 @@ namespace vx::sqlite_utils {
     sqlite3_generic_deleter {}( static_cast<void *>( _what ) );
   }
 
-  std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename ) {
+  std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename ) noexcept {
 
-    sqlite3 *databaseHandle = nullptr;
-    const int resultCode = sqlite3_open( _filename.c_str(), &databaseHandle );
-    std::unique_ptr<sqlite3, sqlite3_deleter> database { databaseHandle };
+    std::error_code error {};
+    return sqlite3_make_unique( _filename, error );
+  }
+
+  std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename,
+                                                                 std::error_code &_error ) noexcept {
+
+    sqlite3 *handle = nullptr;
+    const int resultCode = sqlite3_open( _filename.c_str(), &handle );
+    std::unique_ptr<sqlite3, sqlite3_deleter> database { handle };
     if ( resultCode != SQLITE_OK ) {
+
+      _error.clear();
+      SqliteErrorCategory::instance().setMessage( sqlite3_errmsg( handle ) );
+      _error = { resultCode, SqliteErrorCategory::instance() };
 
 #ifdef DEBUG
       std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-      std::cout << "ERROR: '" << sqlite3_errmsg( databaseHandle ) << "'" << std::endl;
+      std::cout << "ERROR: '" << sqlite3_errmsg( handle ) << "'" << std::endl;
       std::cout << std::endl;
 #endif
       database.reset();
     }
+
     return database;
   }
 
-  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_handle, //std::unique_ptr<sqlite3, sqlite3_deleter> _database,
-                                                                                const std::string &_sql ) {
+  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_handle,
+                                                                                const std::string &_sql ) noexcept {
+
+    std::error_code error {};
+    return sqlite3_stmt_make_unique( _handle, _sql, error );
+  }
+
+  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_handle,
+                                                                                const std::string &_sql,
+                                                                                std::error_code &_error ) noexcept {
 
     sqlite3_stmt *statementHandle = nullptr;
     const int resultCode = sqlite3_prepare_v2( _handle, _sql.c_str(), -1, &statementHandle, nullptr );
     std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> statement { statementHandle };
     if ( resultCode != SQLITE_OK ) {
 
+      _error.clear();
+      SqliteErrorCategory::instance().setMessage( sqlite3_errmsg( _handle ) );
+      _error = { resultCode, SqliteErrorCategory::instance() };
+
 #ifdef DEBUG
       std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
+      std::cout << "ERROR: '" << sqlite3_errmsg( _handle ) << "'" << std::endl;
       std::cout << std::endl;
 #endif
       statement.reset();
@@ -131,20 +157,22 @@ namespace vx::sqlite_utils {
     return statement;
   }
 
-  std::tuple<int, std::string> importDump( sqlite3 *_handle,
-                                           const std::string &_schema,
-                                           const std::string &_filename ) noexcept {
+  std::error_code importDump( sqlite3 *_handle,
+                              const std::string &_schema,
+                              const std::string &_filename ) noexcept {
 
     if ( std::error_code errorCode {}; !std::filesystem::exists( _filename, errorCode ) || errorCode ) {
 
-      return { SQLITE_IOERR, "File not found." };
+      SqliteErrorCategory::instance().setMessage( "File not found." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
     std::vector<char> dump {};
     std::ifstream input( _filename, std::ios::in | std::ios::binary );
     if ( !input.is_open() ) {
 
-      return { SQLITE_IOERR, "Cannot open file for import." };
+      SqliteErrorCategory::instance().setMessage( "Cannot open file for import." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
     if ( !input.eof() && !input.fail() ) {
 
@@ -162,13 +190,15 @@ namespace vx::sqlite_utils {
     catch ( const std::ofstream::failure &_exception ) {
 
       std::cout << _exception.what() << std::endl;
-      return { SQLITE_IOERR, "Unable to close the import file." };
+      SqliteErrorCategory::instance().setMessage( "Unable to close the import file." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
     std::vector<unsigned char> converted( std::begin( dump ), std::end( dump ) );
     if ( converted.empty() ) {
 
-      return { SQLITE_IOERR, "Cannot read data from file." };
+      SqliteErrorCategory::instance().setMessage( "Cannot read data from file." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
     auto *databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
@@ -176,34 +206,38 @@ namespace vx::sqlite_utils {
 
     if ( const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE ); resultCode != SQLITE_OK ) {
 
-      return { resultCode, sqlite3_errmsg( _handle ) };
+      SqliteErrorCategory::instance().setMessage( sqlite3_errmsg( _handle ) );
+      return { resultCode, SqliteErrorCategory::instance() };
     }
 
     return {};
   }
 
-  std::tuple<int, std::string> exportDump( sqlite3 *_handle,
-                                           const std::string &_schema,
-                                           const std::string &_filename ) noexcept {
+  std::error_code exportDump( sqlite3 *_handle,
+                              const std::string &_schema,
+                              const std::string &_filename ) noexcept {
 
     /* Dump database */
     sqlite3_int64 serializationSize = 0;
     const std::unique_ptr<unsigned char, sqlite3_generic_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
     if ( !dump || serializationSize == 0 ) {
 
-      return { SQLITE_IOERR, "Export empty or invalid." };
+      SqliteErrorCategory::instance().setMessage( "Export empty or invalid." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
     std::vector<char> converted( dump.get(), dump.get() + serializationSize );
     if ( converted.empty() ) {
 
-      return { SQLITE_IOERR, "Export not convertable." };
+      SqliteErrorCategory::instance().setMessage( "Export not convertable." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
     std::ofstream output( _filename, std::ios::out | std::ios::binary );
     if ( !output.is_open() ) {
 
-      return { SQLITE_IOERR, "Cannot open file for export." };
+      SqliteErrorCategory::instance().setMessage( "Cannot open file for export." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
     try {
 
@@ -213,7 +247,8 @@ namespace vx::sqlite_utils {
     catch ( const std::ofstream::failure &_exception ) {
 
       std::cout << _exception.what() << std::endl;
-      return { SQLITE_IOERR, "Unable to write or close the export file." };
+      SqliteErrorCategory::instance().setMessage( "Unable to write or close the export file." );
+      return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
     return {};

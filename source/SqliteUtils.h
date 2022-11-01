@@ -33,6 +33,7 @@
 /* stl header */
 #include <memory>
 #include <string>
+#include <system_error>
 
 /* forward declation of sqlite3 */
 struct sqlite3;
@@ -105,18 +106,38 @@ namespace vx::sqlite_utils {
   /**
    * @brief Create sqlite3_open unique pointer.
    * @param _filename   Database filename.
-   * @return Unique pointer for sqlite3 handle.
+   * @return Unique pointer for sqlite3 handle or nullptr on error.
    */
-  std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename );
+  std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename ) noexcept;
+
+  /**
+   * @brief Create sqlite3_open unique pointer.
+   * @param _filename   Database filename.
+   * @param _error   Error code.
+   * @return Unique pointer for sqlite3 handle or nullptr on error.
+   */
+  std::unique_ptr<sqlite3, sqlite3_deleter> sqlite3_make_unique( const std::string &_filename,
+                                                                 std::error_code &_error ) noexcept;
 
   /**
    * @brief Create sqlite3_stmt unique pointer.
    * @param _handle   Database handle.
    * @param _sql   Sql command.
-   * @return Unique pointer for sqlite3_stmt.
+   * @return Unique pointer for sqlite3_stmt or nullptr on error.
    */
   std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_handle,
-                                                                                const std::string &_sql );
+                                                                                const std::string &_sql ) noexcept;
+
+  /**
+   * @brief Create sqlite3_stmt unique pointer.
+   * @param _handle   Database handle.
+   * @param _sql   Sql command.
+   * @param _error   Error code.
+   * @return Unique pointer for sqlite3_stmt or nullptr on error.
+   */
+  std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> sqlite3_stmt_make_unique( sqlite3 *_handle,
+                                                                                const std::string &_sql,
+                                                                                std::error_code &_error ) noexcept;
 
   /**
    * @brief Import sql dump.
@@ -125,9 +146,9 @@ namespace vx::sqlite_utils {
    * @param _filename   Database filename.
    * @return Result code and message of operation.
    */
-  std::tuple<int, std::string> importDump( sqlite3 *_handle,
-                                           const std::string &_schema,
-                                           const std::string &_filename ) noexcept;
+  std::error_code importDump( sqlite3 *_handle,
+                              const std::string &_schema,
+                              const std::string &_filename ) noexcept;
 
   /**
    * @brief Export sql dump.
@@ -136,9 +157,9 @@ namespace vx::sqlite_utils {
    * @param _filename   Database filename.
    * @return Result code and message of operation.
    */
-  std::tuple<int, std::string> exportDump( sqlite3 *_handle,
-                                           const std::string &_schema,
-                                           const std::string &_filename ) noexcept;
+  std::error_code exportDump( sqlite3 *_handle,
+                              const std::string &_schema,
+                              const std::string &_filename ) noexcept;
 
   /**
    * @brief Calculate the location distance as sql command.

@@ -67,10 +67,11 @@
 int main() {
 
   /* Open database */
-  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:" ) };
-  if ( !database ) {
+  std::error_code error_code {};
+  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:", error_code ) };
+  if ( !database || error_code ) {
 
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
+    std::cout << "ERROR: '" << error_code.message() << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
   }
