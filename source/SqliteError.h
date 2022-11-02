@@ -31,6 +31,8 @@
 #pragma once
 
 /* stl header */
+#include <string>
+#include <string_view>
 #include <system_error>
 
 /* modern.cpp.core */
@@ -88,19 +90,35 @@ namespace std {
 
 std::error_code make_error_code( vx::sqlite::Error );
 
-namespace {
+namespace { // NOSONAR
 
-  class SqliteErrorCategory : public std::error_category,
-                              public vx::Singleton<SqliteErrorCategory> {
+  class SqliteErrorCategory final : public std::error_category,
+                                    public vx::Singleton<SqliteErrorCategory> {
 
   public:
-    [[nodiscard]] const char *name() const noexcept final { return "sqlite"; }
+    /**
+     * @brief Reimplementation of std::error_category::name.
+     * @return Name of this error category.
+     */
+    [[nodiscard]] const char *name() const noexcept override { return "sqlite"; }
 
-    [[nodiscard]] std::string message( [[maybe_unused]] int _condition ) const noexcept final { return m_message; }
+    /**
+     * @brief Reimplementation of std::error_category::message.
+     * @param _condition   Condition value.
+     * @return Error message for condition.
+     */
+    [[nodiscard]] std::string message( [[maybe_unused]] int _condition ) const noexcept override { return m_message; }
 
-    [[maybe_unused]] void setMessage( const std::string &_message ) noexcept { m_message = _message; }
+    /**
+     * @brief Set a textual message.
+     * @param _message   Message to set.
+     */
+    [[maybe_unused]] void setMessage( std::string_view _message ) noexcept { m_message = _message; }
 
   private:
+    /**
+     * @brief Member for message.
+     */
     std::string m_message {};
   };
 }

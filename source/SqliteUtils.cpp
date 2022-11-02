@@ -57,6 +57,11 @@
 #include "SqliteError.h"
 #include "SqliteUtils.h"
 
+namespace std { // NOSONAR
+
+  using ::strlcpy;
+}
+
 namespace vx::sqlite_utils {
 
   constexpr int halfCircleDegree = 180;
@@ -366,7 +371,7 @@ namespace vx::sqlite_utils {
     string_utils::simplified( str );
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
-    std::strncpy( databuffer, str.data(), str.size() );
+    std::strlcpy( databuffer, str.data(), str.size() );
 
     sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
   }

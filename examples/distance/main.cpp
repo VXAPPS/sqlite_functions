@@ -53,6 +53,17 @@
  * Tokyo     |  35.6839 |  139.7744
  */
 
+static int printResultAndExit( int _code,
+                               const std::string &_message,
+                               const std::string &_sql) {
+
+  std::cout << "RESULT CODE: (" << _code << ")" << std::endl;
+  std::cout << "ERROR: '" << _message << "'" << std::endl;
+  std::cout << "SQL: '" << _sql << "'" << std::endl;
+  std::cout << std::endl;
+  return EXIT_FAILURE;
+}
+
 int main() {
 
   /* Open database */
@@ -79,11 +90,7 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
   /* Insert data */
@@ -91,33 +98,21 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
   sql = "INSERT INTO cities VALUES('Tokyo', 35.6839, 139.7744)";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
   sql = "INSERT INTO cities VALUES('Munich', 48.1375, 11.575)";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
   /* Calculate a distance from select */
@@ -134,20 +129,12 @@ int main() {
   resultCode = sqlite3_bind_double( statement.get(), 1, latitude );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
   resultCode = sqlite3_bind_double( statement.get(), 2, longitude );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
 #ifdef DEBUG
@@ -172,22 +159,14 @@ int main() {
   }
   if ( resultCode != SQLITE_DONE ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
 #ifdef DEBUG
   resultCode = sqlite3_exec( database.get(), sql2Expect.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 #endif
 
@@ -195,22 +174,14 @@ int main() {
   resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
   sql = "SELECT DISTANCE(latitude, longitude, 52.5167, 13.3833) AS distance FROM cities WHERE city IS 'Tokyo'";
   resultCode = sqlite3_exec( database.get(), sql.c_str(), vx::sqlite_utils::outputCallback, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
-    std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;
-    std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
-    std::cout << "SQL: '" << sql << "'" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
+    return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );
   }
 
   return EXIT_SUCCESS;
