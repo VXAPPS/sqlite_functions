@@ -168,7 +168,7 @@ namespace vx::sqlite_utils {
    * @param _argv   Args array.
    */
   void distance( sqlite3_context *_context,
-                 int _argc,
+                 std::int32_t _argc,
                  sqlite3_value **_argv ) noexcept;
 
   /**
@@ -178,7 +178,7 @@ namespace vx::sqlite_utils {
    * @param _argv   Args array.
    */
   void transliteration( sqlite3_context *_context,
-                        int _argc,
+                        std::int32_t _argc,
                         sqlite3_value **_argv ) noexcept;
 
   /**
@@ -189,8 +189,8 @@ namespace vx::sqlite_utils {
    * @param _columns   Column names.
    * @return Result code.
    */
-  int outputCallback( void *_data,
-                      int _argc,
-                      char **_argv,
-                      char **_columns ) noexcept;
+  std::int32_t outputCallback( void *_data,
+                               std::int32_t _argc,
+                               char **_argv,
+                               char **_columns ) noexcept;
 }

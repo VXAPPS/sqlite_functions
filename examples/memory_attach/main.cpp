@@ -64,9 +64,9 @@
  * Melbourne | -37.8136 |  144.9631
  */
 
-static int printResultAndExit( int _code,
-                               const std::string &_message,
-                               const std::string &_sql) {
+static std::int32_t printResultAndExit( std::int32_t _code,
+                                        const std::string &_message,
+                                        const std::string &_sql ) {
 
   std::cout << "RESULT CODE: (" << _code << ")" << std::endl;
   std::cout << "ERROR: '" << _message << "'" << std::endl;
@@ -75,7 +75,7 @@ static int printResultAndExit( int _code,
   return EXIT_FAILURE;
 }
 
-int main() {
+std::int32_t main() {
 
   /* Open database */
   std::error_code error_code {};
@@ -89,7 +89,7 @@ int main() {
 
   /* Create table */
   std::string sql = "CREATE TABLE cities (city STRING, latitude REAL, longitude REAL)";
-  int resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+  std::int32_t resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     return printResultAndExit( resultCode, sqlite3_errmsg( database.get() ), sql );

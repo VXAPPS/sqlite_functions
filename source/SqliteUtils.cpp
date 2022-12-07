@@ -64,13 +64,13 @@ namespace std { // NOSONAR
 
 namespace vx::sqlite_utils {
 
-  constexpr int halfCircleDegree = 180;
+  constexpr std::int32_t halfCircleDegree = 180;
 
   constexpr double earthBlubKm = 6378.137;
 
   void sqlite3_deleter::operator()( sqlite3 *_handle ) const {
 
-    [[maybe_unused]] const int resultCode = sqlite3_close( _handle );
+    [[maybe_unused]] const std::int32_t resultCode = sqlite3_close( _handle );
 #ifdef DEBUG
     if ( resultCode != SQLITE_OK ) {
 
@@ -83,7 +83,7 @@ namespace vx::sqlite_utils {
 
   void sqlite3_stmt_deleter::operator()( sqlite3_stmt *_statement ) const {
 
-    [[maybe_unused]] const int resultCode = sqlite3_finalize( _statement );
+    [[maybe_unused]] const std::int32_t resultCode = sqlite3_finalize( _statement );
 #ifdef DEBUG
     if ( resultCode != SQLITE_OK ) {
 
@@ -113,7 +113,7 @@ namespace vx::sqlite_utils {
                                                                  std::error_code &_error ) noexcept {
 
     sqlite3 *handle = nullptr;
-    const int resultCode = sqlite3_open( _filename.c_str(), &handle );
+    const std::int32_t resultCode = sqlite3_open( _filename.c_str(), &handle );
     std::unique_ptr<sqlite3, sqlite3_deleter> database { handle };
     if ( resultCode != SQLITE_OK ) {
 
@@ -144,7 +144,7 @@ namespace vx::sqlite_utils {
                                                                                 std::error_code &_error ) noexcept {
 
     sqlite3_stmt *statementHandle = nullptr;
-    const int resultCode = sqlite3_prepare_v2( _handle, _sql.c_str(), -1, &statementHandle, nullptr );
+    const std::int32_t resultCode = sqlite3_prepare_v2( _handle, _sql.c_str(), -1, &statementHandle, nullptr );
     std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter> statement { statementHandle };
     if ( resultCode != SQLITE_OK ) {
 
@@ -199,17 +199,17 @@ namespace vx::sqlite_utils {
       return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
-    std::vector<unsigned char> converted( std::begin( dump ), std::end( dump ) );
+    std::vector<std::uint8_t> converted( std::cbegin( dump ), std::cend( dump ) );
     if ( converted.empty() ) {
 
       SqliteErrorCategory::instance().setMessage( "Cannot read data from file." );
       return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
-    auto *databuffer( static_cast<unsigned char *>( sqlite3_malloc64( sizeof( unsigned char ) * converted.size() ) ) );
+    auto *databuffer( static_cast<std::uint8_t *>( sqlite3_malloc64( sizeof( std::uint8_t ) * converted.size() ) ) );
     std::memcpy( databuffer, converted.data(), converted.size() );
 
-    if ( const int resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE ); resultCode != SQLITE_OK ) {
+    if ( const std::int32_t resultCode = sqlite3_deserialize( _handle, _schema.c_str(), databuffer, static_cast<sqlite3_int64>( converted.size() ), static_cast<sqlite3_int64>( converted.size() ), SQLITE_DESERIALIZE_RESIZEABLE | SQLITE_DESERIALIZE_FREEONCLOSE ); resultCode != SQLITE_OK ) {
 
       SqliteErrorCategory::instance().setMessage( sqlite3_errmsg( _handle ) );
       return { resultCode, SqliteErrorCategory::instance() };
@@ -224,7 +224,7 @@ namespace vx::sqlite_utils {
 
     /* Dump database */
     sqlite3_int64 serializationSize = 0;
-    const std::unique_ptr<unsigned char, sqlite3_generic_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
+    const std::unique_ptr<std::uint8_t, sqlite3_generic_deleter> dump( sqlite3_serialize( _handle, _schema.c_str(), &serializationSize, 0 ) );
     if ( !dump || serializationSize == 0 ) {
 
       SqliteErrorCategory::instance().setMessage( "Export empty or invalid." );
@@ -260,7 +260,7 @@ namespace vx::sqlite_utils {
   }
 
   void distance( sqlite3_context *_context,
-                 int _argc,
+                 std::int32_t _argc,
                  sqlite3_value **_argv ) noexcept {
 
     /* Parameter count mismatch */
@@ -292,7 +292,7 @@ namespace vx::sqlite_utils {
       }
     }
 #else
-    for ( int x = 0; x < _argc; x++ ) {
+    for ( std::int32_t x = 0; x < _argc; x++ ) {
 
       if ( sqlite3_value_type( _argv[ x ] ) == SQLITE_NULL ) {
 
@@ -317,7 +317,7 @@ namespace vx::sqlite_utils {
   }
 
   void transliteration( sqlite3_context *_context,
-                        int _argc,
+                        std::int32_t _argc,
                         sqlite3_value **_argv ) noexcept {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
@@ -376,10 +376,10 @@ namespace vx::sqlite_utils {
     sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
   }
 
-  int outputCallback( [[maybe_unused]] void *_data, // NOSONAR more meaningful than void
-                      int _argc,
-                      char **_argv,
-                      char **_columns ) noexcept {
+  std::int32_t outputCallback( [[maybe_unused]] void *_data, // NOSONAR more meaningful than void
+                               std::int32_t _argc,
+                               char **_argv,
+                               char **_columns ) noexcept {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
     const std::span args( _argv, static_cast<std::size_t>( _argc ) );
@@ -389,7 +389,7 @@ namespace vx::sqlite_utils {
       std::cout << columns[ i ] << " = " << ( args[ i ] ? args[ i ] : "NULL" ) << std::endl;
     }
 #else
-    for ( int i = 0; i < _argc; ++i ) {
+    for ( std::int32_t i = 0; i < _argc; ++i ) {
 
       std::cout << _columns[ i ] << " = " << ( _argv[ i ] ? _argv[ i ] : "NULL" ) << std::endl;
     }

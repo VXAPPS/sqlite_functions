@@ -53,9 +53,9 @@
  * Tokyo     |  35.6839 |  139.7744
  */
 
-static int printResultAndExit( int _code,
-                               const std::string &_message,
-                               const std::string &_sql) {
+static std::int32_t printResultAndExit( std::int32_t _code,
+                                        const std::string &_message,
+                                        const std::string &_sql ) {
 
   std::cout << "RESULT CODE: (" << _code << ")" << std::endl;
   std::cout << "ERROR: '" << _message << "'" << std::endl;
@@ -64,7 +64,7 @@ static int printResultAndExit( int _code,
   return EXIT_FAILURE;
 }
 
-int main() {
+std::int32_t main() {
 
   /* Open database */
   std::error_code error_code {};
@@ -76,7 +76,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  int resultCode = sqlite3_create_function_v2( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &vx::sqlite_utils::distance, nullptr, nullptr, nullptr );
+  std::int32_t resultCode = sqlite3_create_function_v2( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &vx::sqlite_utils::distance, nullptr, nullptr, nullptr );
   if ( resultCode != SQLITE_OK ) {
 
     std::cout << "RESULT CODE: (" << resultCode << ")" << std::endl;

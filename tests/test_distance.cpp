@@ -78,7 +78,7 @@ namespace vx {
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
     }
 
-    int resultCode = sqlite3_create_function_v2( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &sqlite_utils::distance, nullptr, nullptr, nullptr );
+    std::int32_t resultCode = sqlite3_create_function_v2( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &sqlite_utils::distance, nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
@@ -193,7 +193,8 @@ namespace vx {
   #pragma clang diagnostic pop
 #endif
 
-int main( int argc, char **argv ) {
+std::int32_t main( std::int32_t argc,
+                   char **argv ) {
 
   InitGoogleTest( &argc, argv );
   return RUN_ALL_TESTS();

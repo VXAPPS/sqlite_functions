@@ -107,7 +107,7 @@ namespace { // NOSONAR
      * @param _condition   Condition value.
      * @return Error message for condition.
      */
-    [[nodiscard]] std::string message( [[maybe_unused]] int _condition ) const noexcept override { return m_message; }
+    [[nodiscard]] std::string message( [[maybe_unused]] std::int32_t _condition ) const noexcept override { return m_message; }
 
     /**
      * @brief Set a textual message.
