@@ -13,13 +13,15 @@ make -j`nproc`
 ### Distance
 ```sql
 # First = Munich, Second = Berlin
-SELECT DISTANCE(48.1375, 11.575, 52.5167, 13.3833) AS distance; # distance = 504.100899610028
+SELECT DISTANCE(48.1375, 11.575, 52.5167, 13.3833) AS distance;
+# distance = 504.100899610028
 ```
 
 ### Transliteration
 ```sql
 # Katakana
-SELECT TRANSLITERATION('パイナップル') AS transliterated; # transliterated = painappuru
+SELECT TRANSLITERATION('パイナップル') AS transliterated;
+# transliterated = painappuru
 ````
 
 ### Phone Book
@@ -27,20 +29,32 @@ SELECT TRANSLITERATION('パイナップル') AS transliterated; # transliterated
 # SQL DATA
 # name
 # Игорь Фёдорович Стравинский # Igor' Fëdorovič Stravinskij
-# 宮崎 駿 # Hayao Miyazaki
-# 艾未未 # Ai Weiwei
-# 오미주 # Sandra Oh
-# パイナップル # Painappuro
-# Albert Einstein
-# Zebra
+# 宮崎 駿                      # Hayao Miyazaki
+# 艾未未                       # Ai Weiwei
+# 오미주                        # Sandra Oh
+# パイナップル                  # Painappuro
+# Albert Einstein             # Albert Einstein
+# Zebra                       # Zebra
 
 # Without TRANSLITERATION
 SELECT name FROM phone_book ORDER BY LOWER(name);
-# result = "Albert Einstein", "Zebra", "Игорь Фёдорович Стравинский", "パイナップル", "宮崎 駿", "艾未未", "오미주"
+# Albert Einstein             # Albert Einstein
+# Zebra                       # Zebra
+# Игорь Фёдорович Стравинский # Igor' Fëdorovič Stravinskij
+# パイナップル                  # Painappuro
+# 宮崎 駿                      # Hayao Miyazaki
+# 艾未未                       # Ai Weiwei
+# 오미주                        # Sandra Oh
 
 # With TRANSLITERATION
-SELECT name FROM phone_book ORDER BY LOWER(TRANSLITERATION(name))
-# result = "艾未未", "Albert Einstein", "宮崎 駿", "Игорь Фёдорович Стравинский", "오미주", "パイナップル", "Zebra"
+SELECT name FROM phone_book ORDER BY LOWER(TRANSLITERATION(name));
+# 艾未未                       # Ai Weiwei
+# Albert Einstein             # Albert Einstein
+# 宮崎 駿                      # Hayao Miyazaki
+# Игорь Фёдорович Стравинский # Igor' Fëdorovič Stravinskij
+# 오미주                        # Sandra Oh
+# パイナップル                  # Painappuro
+# Zebra                       # Zebra
 ```
 
 ## Helper
