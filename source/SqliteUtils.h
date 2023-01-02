@@ -64,7 +64,7 @@ namespace vx::sqlite_utils {
      * @brief Sqlite3 operator ().
      * @param _handle   To sqlite3_close.
      */
-    void operator()( sqlite3 *_handle ) const;
+    void operator()( sqlite3 *_handle ) const noexcept;
   };
 
   /**
@@ -76,7 +76,7 @@ namespace vx::sqlite_utils {
      * @brief Sqlite3 statement operator ().
      * @param _statement   To sqlite3_finalize.
      */
-    void operator()( sqlite3_stmt *_statement ) const;
+    void operator()( sqlite3_stmt *_statement ) const noexcept;
   };
 
   /**
@@ -88,7 +88,7 @@ namespace vx::sqlite_utils {
      * @brief Sqlite3 generic operator ().
      * @param _what   To sqlite3_free.
      */
-    void operator()( void *_what ) const;
+    void operator()( void *_what ) const noexcept;
   };
 
   /**
@@ -100,7 +100,7 @@ namespace vx::sqlite_utils {
      * @brief Sqlite3 string operator ().
      * @param _what   To sqlite3_free.
      */
-    void operator()( char *_what ) const;
+    void operator()( char *_what ) const noexcept;
   };
 
   /**

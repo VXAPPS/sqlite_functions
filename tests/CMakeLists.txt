@@ -37,7 +37,7 @@ function(make_test target)
 
   target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    SQLite::functions
+    SQLite::Functions
     GTest::gtest_main
   )
 

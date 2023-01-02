@@ -28,6 +28,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+cmake_host_system_information(RESULT CPU_COUNT QUERY NUMBER_OF_PHYSICAL_CORES)
+
 include(ExternalProject)
 
 set(SQLITE_SRC ${CMAKE_BINARY_DIR}/_deps/sqlite-src)
@@ -38,9 +40,13 @@ else()
   set(SQLITE_LIBRARY ${SQLITE_INSTALL}/lib/sqlite3.lib)
 endif()
 set(SQLITE_INCLUDE_DIR ${SQLITE_INSTALL}/include)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(SQLITE_DEBUG --enable-debug)
+endif()
 
 ExternalProject_Add(sqlite
-  SOURCE_DIR ${SQLITE_SRC}
+  DEPENDS zlib
+  PREFIX ${SQLITE_SRC}
   URL https://sqlite.org/2022/sqlite-autoconf-3400100.tar.gz
   URL_HASH SHA512=50ff85b40b0017a73b52988843ec439358a8dde7d5d012a33ecfdaa67006697692f091a62d5f052f64e6fee84e27251864d331f63039a326ae4d5bf4a4dd5a91
 #  GIT_REPOSITORY https://github.com/sqlite/sqlite.git
@@ -49,18 +55,15 @@ ExternalProject_Add(sqlite
   USES_TERMINAL_DOWNLOAD FALSE
   CONFIGURE_COMMAND
     CC=${CMAKE_C_COMPILER}
-#    CFLAGS=${CMAKE_C_FLAGS}
-#    LDFLAGS=${CMAKE_STATIC_LINKER_FLAGS}
-#    LDFLAGS=ZLIB_DIR
-    ${SQLITE_SRC}/configure
-    -q #quite
+    LDFLAGS=${ZLIB_DIR}
+    ${SQLITE_SRC}/src/sqlite/configure
+#    -q #quite
     --prefix=${SQLITE_INSTALL}
     --enable-static=yes
     --enable-shared=no
-    --enable-threadsafe=yes
-    --enable-debug=no
-#    --disable-largefile
-  BUILD_COMMAND make
+    --enable-threadsafe
+    ${SQLITE_DEBUG}
+  BUILD_COMMAND make -j${CPU_COUNT}
   TEST_COMMAND ""
   INSTALL_COMMAND make install
   INSTALL_DIR ${SQLITE_INSTALL}

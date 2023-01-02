@@ -38,7 +38,7 @@ add_library(${PROJECT_NAME}
   SqliteUtils.h
 )
 
-add_library(SQLite::functions ALIAS ${PROJECT_NAME})
+add_library(SQLite::Functions ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC

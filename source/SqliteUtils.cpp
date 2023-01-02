@@ -30,7 +30,6 @@
 
 /* c header */
 #include <cmath>
-#include <cstddef> // std::byte
 #include <cstring> // std::memcpy
 
 /* stl header */
@@ -68,7 +67,7 @@ namespace vx::sqlite_utils {
 
   constexpr double earthBlubKm = 6378.137;
 
-  void sqlite3_deleter::operator()( sqlite3 *_handle ) const {
+  void sqlite3_deleter::operator()( sqlite3 *_handle ) const noexcept {
 
     [[maybe_unused]] const std::int32_t resultCode = sqlite3_close( _handle );
 #ifdef DEBUG
@@ -81,7 +80,7 @@ namespace vx::sqlite_utils {
 #endif
   }
 
-  void sqlite3_stmt_deleter::operator()( sqlite3_stmt *_statement ) const {
+  void sqlite3_stmt_deleter::operator()( sqlite3_stmt *_statement ) const noexcept {
 
     [[maybe_unused]] const std::int32_t resultCode = sqlite3_finalize( _statement );
 #ifdef DEBUG
@@ -93,12 +92,12 @@ namespace vx::sqlite_utils {
 #endif
   }
 
-  void sqlite3_generic_deleter::operator()( void *_what ) const { // NOSONAR more meaningful than void
+  void sqlite3_generic_deleter::operator()( void *_what ) const noexcept { // NOSONAR more meaningful than void
 
     sqlite3_free( _what );
   }
 
-  void sqlite3_str_deleter::operator()( char *_what ) const {
+  void sqlite3_str_deleter::operator()( char *_what ) const noexcept {
 
     sqlite3_generic_deleter {}( static_cast<void *>( _what ) );
   }

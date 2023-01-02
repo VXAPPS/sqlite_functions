@@ -46,10 +46,10 @@ project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_UR
 include(cmake/env.cmake)
 
 # Fetch Content Dependencies
-#include(${CMAKE}/fetch/magic_enum.cmake)
 include(${CMAKE}/fetch/modern.cpp.core.cmake)
 
 # External Project Dependencies
+include(${CMAKE}/external/zlib.cmake)
 include(${CMAKE}/external/sqlite.cmake)
 add_subdirectory(source)
 
