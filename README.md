@@ -31,5 +31,5 @@ make -j`nproc`
 - **exportDump** - Export sql dump.
 
 ## Function Extensions
-- **DISTANCE** - DISTANCE( latitude1, longitude1, latitude2, longitude2 ).
-- **TRANSLITERATION** - TRANSLITERATION( any_literation ).
+- **DISTANCE** - DISTANCE(latitude1, longitude1, latitude2, longitude2).
+- **TRANSLITERATION** - TRANSLITERATION(any_literation).
