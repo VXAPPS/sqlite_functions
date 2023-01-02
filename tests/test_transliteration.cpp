@@ -58,6 +58,7 @@ namespace vx {
    * 오미주 # Sandra Oh
    * パイナップル # Painappuro
    * Albert Einstein
+   * Zebra
    */
 
   TEST( Transliteration, OrderBy ) {
@@ -120,6 +121,13 @@ namespace vx {
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
+    sql = "INSERT INTO mixed VALUES('Zebra', 'Zebra')";
+    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    if ( resultCode != SQLITE_OK ) {
+
+      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+    }
+
     sql = "INSERT INTO mixed VALUES('Albert Einstein', 'Albert Einstein')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
@@ -141,7 +149,7 @@ namespace vx {
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    const std::vector<std::string> expected = { "ai wei wei", "albert einstein", "gong qi jun", "igor' fedorovic stravinskij", "omiju", "painappuru" };
+    const std::vector<std::string> expected = { "ai wei wei", "albert einstein", "gong qi jun", "igor' fedorovic stravinskij", "omiju", "painappuru", "zebra" };
     EXPECT_EQ( asciiListOrdered, expected );
   }
 
