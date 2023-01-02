@@ -85,42 +85,42 @@ namespace vx {
     }
 
     /* Insert data */
-    sql = "INSERT INTO mixed VALUES('Игорь Фёдорович Стравинский','Igor'' Fëdorovič Stravinskij')";
+    sql = "INSERT INTO mixed VALUES('Игорь Фёдорович Стравинский', 'Igor'' Fëdorovič Stravinskij')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('宮崎 駿','Hayao Miyazaki')";
+    sql = "INSERT INTO mixed VALUES('宮崎 駿', 'Hayao Miyazaki')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('艾未未','Ai Weiwei')";
+    sql = "INSERT INTO mixed VALUES('艾未未', 'Ai Weiwei')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('오미주','Sandra Oh')";
+    sql = "INSERT INTO mixed VALUES('오미주', 'Sandra Oh')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('パイナップル','Ananas')";
+    sql = "INSERT INTO mixed VALUES('パイナップル', 'Ananas')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('Albert Einstein','Albert Einstein')";
+    sql = "INSERT INTO mixed VALUES('Albert Einstein', 'Albert Einstein')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
@@ -170,42 +170,42 @@ namespace vx {
     }
 
     /* Insert data */
-    sql = "INSERT INTO mixed VALUES('Игорь Фёдорович Стравинский','Igor'' Fëdorovič Stravinskij')";
+    sql = "INSERT INTO mixed VALUES('Игорь Фёдорович Стравинский', 'Igor'' Fëdorovič Stravinskij')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('宮崎 駿','Hayao Miyazaki')";
+    sql = "INSERT INTO mixed VALUES('宮崎 駿', 'Hayao Miyazaki')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('艾未未','Ai Weiwei')";
+    sql = "INSERT INTO mixed VALUES('艾未未', 'Ai Weiwei')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('오미주','Sandra Oh')";
+    sql = "INSERT INTO mixed VALUES('오미주', 'Sandra Oh')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('パイナップル','Ananas')";
+    sql = "INSERT INTO mixed VALUES('パイナップル', 'Ananas')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    sql = "INSERT INTO mixed VALUES('Albert Einstein','Albert Einstein')";
+    sql = "INSERT INTO mixed VALUES('Albert Einstein', 'Albert Einstein')";
     resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
