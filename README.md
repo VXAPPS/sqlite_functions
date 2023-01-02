@@ -1,6 +1,19 @@
 # sqlite_functions
 Sqlite3 function extension in most native and modern C++17 or C++20.
 
+## Examples
+### Distance
+```sql
+# First = Munich, Second = Berlin
+SELECT DISTANCE(48.1375, 11.575, 52.5167, 13.3833) AS distance # distance = 504.100899610028
+```
+
+### Transliteration
+```sql
+# Katakana
+SELECT TRANSLITERATION('パイナップル') AS transliterated # transliterated = painappuru
+```
+
 ## Build
 ```bash
 mkdir build

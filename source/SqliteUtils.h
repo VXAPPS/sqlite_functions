@@ -148,7 +148,7 @@ namespace vx::sqlite_utils {
    */
   std::error_code importDump( sqlite3 *_handle,
                               const std::string &_schema,
-                              const std::string &_filename ) noexcept;
+                              const std::string &_filename );
 
   /**
    * @brief Export sql dump.
@@ -159,7 +159,7 @@ namespace vx::sqlite_utils {
    */
   std::error_code exportDump( sqlite3 *_handle,
                               const std::string &_schema,
-                              const std::string &_filename ) noexcept;
+                              const std::string &_filename );
 
   /**
    * @brief Calculate the location distance as sql command.
@@ -179,7 +179,7 @@ namespace vx::sqlite_utils {
    */
   void transliteration( sqlite3_context *_context,
                         std::int32_t _argc,
-                        sqlite3_value **_argv ) noexcept;
+                        sqlite3_value **_argv );
 
   /**
    * @brief Output callback for sql command.

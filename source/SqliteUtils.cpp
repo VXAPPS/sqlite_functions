@@ -164,7 +164,7 @@ namespace vx::sqlite_utils {
 
   std::error_code importDump( sqlite3 *_handle,
                               const std::string &_schema,
-                              const std::string &_filename ) noexcept {
+                              const std::string &_filename ) {
 
     if ( std::error_code errorCode {}; !std::filesystem::exists( _filename, errorCode ) || errorCode ) {
 
@@ -220,7 +220,7 @@ namespace vx::sqlite_utils {
 
   std::error_code exportDump( sqlite3 *_handle,
                               const std::string &_schema,
-                              const std::string &_filename ) noexcept {
+                              const std::string &_filename ) {
 
     /* Dump database */
     sqlite3_int64 serializationSize = 0;
@@ -318,7 +318,7 @@ namespace vx::sqlite_utils {
 
   void transliteration( sqlite3_context *_context,
                         std::int32_t _argc,
-                        sqlite3_value **_argv ) noexcept {
+                        sqlite3_value **_argv ) {
 
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
     const std::span args( _argv, static_cast<std::size_t>( _argc ) );
@@ -371,9 +371,9 @@ namespace vx::sqlite_utils {
     string_utils::simplified( str );
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
-    std::strlcpy( databuffer, str.data(), str.size() );
+    std::strlcpy( databuffer, str.data(), str.size() + 1 );
 
-    sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
+    sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() + 1 ), sqlite3_free );
   }
 
   std::int32_t outputCallback( [[maybe_unused]] void *_data, // NOSONAR more meaningful than void

@@ -30,12 +30,8 @@
 
 cmake_minimum_required(VERSION 3.18)
 
-project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES CXX)
-include(cmake/env.cmake)
-
-# Fetch Content Dependencies
-#include(${CMAKE}/fetch/magic_enum.cmake)
-include(${CMAKE}/fetch/modern.cpp.core.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/policy.cmake)
+update_policy()
 
 # Determine if this is built as a subproject (using add_subdirectory)
 # or if it is the master project.
@@ -45,6 +41,13 @@ if (NOT DEFINED SQLITE_MASTER_PROJECT)
     set(SQLITE_MASTER_PROJECT ON)
   endif()
 endif()
+
+project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES CXX)
+include(cmake/env.cmake)
+
+# Fetch Content Dependencies
+#include(${CMAKE}/fetch/magic_enum.cmake)
+include(${CMAKE}/fetch/modern.cpp.core.cmake)
 
 # External Project Dependencies
 include(${CMAKE}/external/sqlite.cmake)

@@ -28,36 +28,40 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-project(test_distance)
+function(make_test target)
+  project(test_${target})
 
-add_executable(${PROJECT_NAME}
-  ${PROJECT_NAME}.cpp
-)
+  add_executable(${PROJECT_NAME}
+    ${PROJECT_NAME}.cpp
+  )
 
-target_link_libraries(${PROJECT_NAME}
-  PRIVATE
-  sqlite_functions
-  GTest::gtest_main
-  Threads::Threads
-)
+  target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    SQLite::functions
+    GTest::gtest_main
+  )
 
-gtest_add_tests(${PROJECT_NAME}
-  SOURCES ${PROJECT_NAME}.cpp
-)
+  gtest_add_tests(${PROJECT_NAME}
+    SOURCES ${PROJECT_NAME}.cpp
+  )
+endfunction()
 
-project(test_transliteration)
+make_test(distance)
+make_test(transliteration)
 
-add_executable(${PROJECT_NAME}
-  ${PROJECT_NAME}.cpp
-)
+# clang-11 cannot allocate
+if(CMAKE_CXX_COMPILER_ID MATCHES "[cC][lL][aA][nN][gG]")
+  string(REPLACE "." ";" VERSION_LIST ${CMAKE_CXX_COMPILER_VERSION})
+  list(GET VERSION_LIST 0 CLANG_VERSION_MAJOR)
+  if(CLANG_VERSION_MAJOR EQUAL 11)
+    get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
+    set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ASAN_OPTIONS=use_sigaltstack=false)
+  endif()
+endif()
 
-target_link_libraries(${PROJECT_NAME}
-  PRIVATE
-  sqlite_functions
-  GTest::gtest_main
-  Threads::Threads
-)
-
-gtest_add_tests(${PROJECT_NAME}
-  SOURCES ${PROJECT_NAME}.cpp
-)
+# gcc needs LD_PRELOAD of libasan and ignore link order
+if(SANITIZER_ADDRESS AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
+  # set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT LD_PRELOAD=${LIBASAN_PATH})
+  set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ASAN_OPTIONS=verify_asan_link_order=0)
+endif()

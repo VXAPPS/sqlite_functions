@@ -28,22 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* cppunit header */
-#ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Weverything"
-#endif
-#ifdef __GNUC__
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Weffc++"
-#endif
+/* gtest header */
 #include <gtest/gtest.h>
-#ifdef __GNUC__
-  #pragma GCC diagnostic pop
-#endif
-#ifdef __clang__
-  #pragma clang diagnostic pop
-#endif
 
 /* sqlite header */
 #include <sqlite3.h>
@@ -155,7 +141,7 @@ namespace vx {
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    std::vector<std::string> expected = { "ai wei wei", "albert einstein", "gong qi jun", "igor' fedorovic stravinskij", "omiju", "painappuru" };
+    const std::vector<std::string> expected = { "ai wei wei", "albert einstein", "gong qi jun", "igor' fedorovic stravinskij", "omiju", "painappuru" };
     EXPECT_EQ( asciiListOrdered, expected );
   }
 
@@ -240,7 +226,7 @@ namespace vx {
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    std::vector<std::string> expected = { "ai wei wei", "albert einstein" };
+    const std::vector<std::string> expected = { "ai wei wei", "albert einstein" };
     EXPECT_EQ( asciiListOrdered, expected );
   }
 }
