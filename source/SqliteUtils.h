@@ -42,7 +42,7 @@ struct sqlite3_stmt;
 struct sqlite3_value;
 
 /**
- * @brief vx (VX APPS) namespace.
+ * @brief vx (VX APPS) sqlite_utils namespace.
  */
 namespace vx::sqlite_utils {
 

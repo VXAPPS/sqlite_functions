@@ -39,7 +39,7 @@
 #include <Singleton.h>
 
 /**
- * @brief vx (VX APPS) namespace.
+ * @brief vx (VX APPS) sqlite namespace.
  */
 namespace vx::sqlite {
 
@@ -87,8 +87,6 @@ namespace std {
   template <>
   struct is_error_code_enum<vx::sqlite::Error> : true_type {};
 }
-
-std::error_code make_error_code( vx::sqlite::Error );
 
 namespace { // NOSONAR
 
