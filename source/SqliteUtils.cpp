@@ -58,7 +58,11 @@
 
 namespace std { // NOSONAR
 
+#ifdef _WIN32
+  using ::strncpy_s;
+#else
   using ::strlcpy;
+#endif
 }
 
 namespace vx::sqlite_utils {
@@ -258,6 +262,8 @@ namespace vx::sqlite_utils {
     return {};
   }
 
+  double pi() { return std::atan(1)*4; }
+
   void distance( sqlite3_context *_context,
                  std::int32_t _argc,
                  sqlite3_value **_argv ) noexcept {
@@ -312,7 +318,7 @@ namespace vx::sqlite_utils {
     const double latitude2 = sqlite3_value_double( _argv[ 2 ] );
     const double longitude2 = sqlite3_value_double( _argv[ 3 ] );
 #endif
-    sqlite3_result_double( _context, std::acos( sin( latitude1 / halfCircleDegree * M_PI ) * std::sin( latitude2 / halfCircleDegree * M_PI ) + std::cos( latitude1 / halfCircleDegree * M_PI ) * std::cos( latitude2 / halfCircleDegree * M_PI ) * std::cos( ( longitude2 / halfCircleDegree * M_PI ) - ( longitude1 / halfCircleDegree * M_PI ) ) ) * earthBlubKm );
+    sqlite3_result_double( _context, std::acos( sin( latitude1 / halfCircleDegree * pi() ) * std::sin( latitude2 / halfCircleDegree * pi() ) + std::cos( latitude1 / halfCircleDegree * pi() ) * std::cos( latitude2 / halfCircleDegree * pi() ) * std::cos( ( longitude2 / halfCircleDegree * pi() ) - ( longitude1 / halfCircleDegree * pi() ) ) ) * earthBlubKm );
   }
 
   void transliteration( sqlite3_context *_context,
@@ -370,7 +376,11 @@ namespace vx::sqlite_utils {
     string_utils::simplified( str );
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
+#ifdef _WIN32
+    std::strncpy_s( databuffer, str.size() + 1, str.data(), str.size() + 1 );
+#else
     std::strlcpy( databuffer, str.data(), str.size() + 1 );
+#endif
 
     sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() + 1 ), sqlite3_free );
   }

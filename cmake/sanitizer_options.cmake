@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Florian Becker <fb@vxapps.com> (VX APPS).
+# Copyright (c) 2023 Florian Becker <fb@vxapps.com> (VX APPS).
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,29 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-find_package(Threads REQUIRED)
-if(UNIX AND NOT APPLE)
-  set(ICU_ROOT /usr/lib/x86_64-linux-gnu/)
-elseif(APPLE)
-  set(ICU_ROOT /usr/local/opt/icu4c/)
+if(SANITIZER_ADDRESS)
+  # clang-11 cannot allocate
+  if(CMAKE_CXX_COMPILER_ID MATCHES "[cC][lL][aA][nN][gG]")
+    string(REPLACE "." ";" VERSION_LIST ${CMAKE_CXX_COMPILER_VERSION})
+    list(GET VERSION_LIST 0 CLANG_VERSION_MAJOR)
+    if(CLANG_VERSION_MAJOR EQUAL 11)
+      get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
+      set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ASAN_OPTIONS=use_sigaltstack=false)
+    endif()
+  endif()
+
+  # gcc needs LD_PRELOAD of libasan and ignore link order
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
+    set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ASAN_OPTIONS=verify_asan_link_order=0)
+  endif()
+
+  if(WIN32)
+    get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
+    set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ASAN_OPTIONS=windows_hook_rtl_allocators=true)
+
+    # copy runtime library
+    get_filename_component(ASAN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
+    file(COPY ${ASAN_DIR}/clang_rt.asan_dbg_dynamic-x86_64.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  endif()
 endif()
-find_package(ICU 70 COMPONENTS i18n uc)

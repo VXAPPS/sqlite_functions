@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Florian Becker <fb@vxapps.com> (VX APPS).
+# Copyright (c) 2023 Florian Becker <fb@vxapps.com> (VX APPS).
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-find_package(Threads REQUIRED)
-if(UNIX AND NOT APPLE)
-  set(ICU_ROOT /usr/lib/x86_64-linux-gnu/)
-elseif(APPLE)
-  set(ICU_ROOT /usr/local/opt/icu4c/)
-endif()
-find_package(ICU 70 COMPONENTS i18n uc)
+include(FetchContent)
+
+set(JOM_EXECUTABLE ${CMAKE_BINARY_DIR}/_deps/jom-src/jom.exe)
+
+FetchContent_Declare(jom
+  URL https://download.qt.io/official_releases/jom/jom_1_1_3.zip
+  URL_HASH SHA512=5b158ead86be4eb3a6780928d9163f8562372f30bde051d8c281d81027b766119a6e9241166b91de0aa6146836cea77e5121290e62e31b7a959407840fc57b33
+)
+
+FetchContent_MakeAvailable(jom)

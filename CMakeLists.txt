@@ -50,7 +50,14 @@ include(${CMAKE}/fetch/modern.cpp.core.cmake)
 
 # External Project Dependencies
 include(${CMAKE}/external/zlib.cmake)
+if(NOT ICU_FOUND)
+  include(${CMAKE}/external/icu.cmake)
+endif()
+if(WIN32)
+  include(${CMAKE}/fetch/jom.cmake)
+endif()
 include(${CMAKE}/external/sqlite.cmake)
+
 add_subdirectory(source)
 
 if(SQLITE_MASTER_PROJECT)

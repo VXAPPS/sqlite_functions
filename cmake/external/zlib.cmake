@@ -28,7 +28,7 @@ else()
 endif()
 set(ZLIB_INCLUDE_DIR ${ZLIB_INSTALL}/include)
 
-ExternalProject_Add(zlib
+ExternalProject_Add(ZLIB
   PREFIX ${ZLIB_SRC}
   GIT_REPOSITORY https://github.com/madler/zlib.git
   GIT_TAG v1.2.13
@@ -50,4 +50,4 @@ file(MAKE_DIRECTORY ${ZLIB_INCLUDE_DIR})
 add_library(ZLIB::ZLIB STATIC IMPORTED GLOBAL)
 set_property(TARGET ZLIB::ZLIB PROPERTY IMPORTED_LOCATION ${ZLIB_LIBRARY})
 set_property(TARGET ZLIB::ZLIB PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_DIR})
-add_dependencies(ZLIB::ZLIB zlib)
+add_dependencies(ZLIB::ZLIB ZLIB)
