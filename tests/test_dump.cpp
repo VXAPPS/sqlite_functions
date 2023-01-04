@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Florian Becker <fb@vxapps.com> (VX APPS).
+ * Copyright (c) 2023 Florian Becker <fb@vxapps.com> (VX APPS).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,14 +28,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* stl header */
+#include <filesystem>
+
 /* gtest header */
 #include <gtest/gtest.h>
 
 /* sqlite header */
 #include <sqlite3.h>
-
-/* modern.cpp.core */
-#include <FloatingPoint.h>
 
 /* sqlite_functions */
 #include <SqliteUtils.h>
@@ -57,7 +57,9 @@ namespace vx {
    * Tokyo     |  35.6839 |  139.7744
    */
 
-  TEST( Distance, Calc ) {
+  constexpr std::string_view exportFilename = "dump.sql";
+
+  TEST( Dump, Export ) {
 
     /* Open database */
     std::error_code error {};
@@ -67,15 +69,9 @@ namespace vx {
       GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
     }
 
-    std::int32_t resultCode = sqlite3_create_function_v2( database.get(), "distance", 4, SQLITE_UTF8, nullptr, &sqlite_utils::distance, nullptr, nullptr, nullptr );
-    if ( resultCode != SQLITE_OK ) {
-
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
-    }
-
     /* Create table */
     std::string sql = "CREATE TABLE cities (city STRING, latitude REAL, longitude REAL)";
-    resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
+    std::int32_t resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
@@ -103,79 +99,47 @@ namespace vx {
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    /* Calculate a distance from select */
-    /* std::string city = "Berlin"; */ // NOSONAR Alternative code.
-    constexpr double latitude = 52.5167;
-    constexpr double longitude = 13.3833;
+    error = sqlite_utils::exportDump( database.get(), "main", std::string( exportFilename ) );
+    EXPECT_FALSE( error );
+    EXPECT_TRUE( std::filesystem::exists( exportFilename ) );
+  }
 
-    sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Munich'";
-    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error );
-    resultCode = sqlite3_bind_double( statement.get(), 1, latitude );
+  TEST( Dump, Import ) {
+
+    EXPECT_TRUE( std::filesystem::exists( exportFilename ) );
+
+    /* Open database */
+    std::error_code error {};
+    const auto database { sqlite_utils::sqlite3_make_unique( ":memory:", error ) };
+    if ( !database ) {
+
+      GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
+    }
+
+    error = sqlite_utils::importDump( database.get(), "main", std::string( exportFilename ) );
+    EXPECT_FALSE( error );
+
+    /* Count entries */
+    const std::string sql = "SELECT COUNT(city) FROM cities";
+    std::int32_t resultCode = sqlite3_exec( database.get(), sql.c_str(), nullptr, nullptr, nullptr );
     if ( resultCode != SQLITE_OK ) {
 
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
-    resultCode = sqlite3_bind_double( statement.get(), 2, longitude );
-    if ( resultCode != SQLITE_OK ) {
 
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
-    }
-
+    const auto statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
-      const double distance = sqlite3_column_double( statement.get(), 0 );
-      EXPECT_TRUE( floating_point::equal( distance, 504.1008996100281 ) );
+      const std::int32_t count = sqlite3_column_int( statement.get(), 0 );
+      EXPECT_EQ( count, 3 );
     }
     if ( resultCode != SQLITE_DONE ) {
 
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
+      GTEST_FAIL() << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'";
     }
 
-    sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'New York'";
-    const auto statementNY = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error );
-    resultCode = sqlite3_bind_double( statementNY.get(), 1, latitude );
-    if ( resultCode != SQLITE_OK ) {
-
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
-    }
-    resultCode = sqlite3_bind_double( statementNY.get(), 2, longitude );
-    if ( resultCode != SQLITE_OK ) {
-
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
-    }
-
-    while ( ( resultCode = sqlite3_step( statementNY.get() ) ) == SQLITE_ROW ) {
-
-      const double distance = sqlite3_column_double( statementNY.get(), 0 );
-      EXPECT_TRUE( floating_point::equal( distance, 6387.483579739179 ) );
-    }
-    if ( resultCode != SQLITE_DONE ) {
-
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
-    }
-
-    sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Tokyo'";
-    const auto statementT = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error );
-    resultCode = sqlite3_bind_double( statementT.get(), 1, latitude );
-    if ( resultCode != SQLITE_OK ) {
-
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
-    }
-    resultCode = sqlite3_bind_double( statementT.get(), 2, longitude );
-    if ( resultCode != SQLITE_OK ) {
-
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
-    }
-
-    while ( ( resultCode = sqlite3_step( statementT.get() ) ) == SQLITE_ROW ) {
-
-      const double distance = sqlite3_column_double( statementT.get(), 0 );
-      EXPECT_TRUE( floating_point::equal( distance, 8931.604652489757 ) );
-    }
-    if ( resultCode != SQLITE_DONE ) {
-
-      GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
-    }
+    EXPECT_TRUE( std::filesystem::remove( exportFilename ) );
+    EXPECT_FALSE( std::filesystem::exists( exportFilename ) );
   }
 }
 #ifdef __clang__

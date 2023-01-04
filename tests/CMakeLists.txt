@@ -47,6 +47,7 @@ function(make_test target)
 endfunction()
 
 make_test(distance)
+make_test(dump)
 make_test(transliteration)
 
 include(${CMAKE}/sanitizer_options.cmake)

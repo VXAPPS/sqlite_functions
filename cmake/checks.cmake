@@ -34,17 +34,45 @@ include(CheckIncludeFiles)
 check_include_file_cxx(format HAVE_FORMAT_INCLUDE)
 if(HAVE_FORMAT_INCLUDE)
   check_cxx_source_compiles(
-    "#include <format>
-    int main() { std::string nodiscard = std::format( \"The answer is {}.\", 42 ); (void)nodiscard; return 0; }"
+    "#include <cstdint>
+    #include <format>
+    #include <string>
+    #include <tuple>
+    std::int32_t main() { std::ignore = std::format( \"The answer is {}.\", 42 ); return 0; }"
     HAVE_FORMAT
+  )
+endif()
+
+check_include_file_cxx(thread HAVE_THREAD_INCLUDE)
+if(HAVE_THREAD_INCLUDE)
+  check_cxx_source_compiles(
+    "#include <cstdint>
+    #include <thread>
+    #include <tuple>
+    std::int32_t main() { std::ignore = std::jthread::hardware_concurrency(); return 0; }"
+    HAVE_JTHREAD
+  )
+endif()
+
+check_include_file_cxx(ranges HAVE_RANGES_INCLUDE)
+if(HAVE_RANGES_INCLUDE)
+  check_cxx_source_compiles(
+    "#include <algorithm>
+    #include <array>
+    #include <cstdint>
+    #include <ranges>
+    std::int32_t main() { std::array list = { 1, 4, 2, 3 }; std::ranges::sort( list ); (void)list; return 0; }"
+    HAVE_RANGES
   )
 endif()
 
 check_include_file_cxx(source_location HAVE_SOURCE_LOCATION_INCLUDE)
 if(HAVE_SOURCE_LOCATION_INCLUDE)
   check_cxx_source_compiles(
-    "#include <source_location>
-    int main() { const std::source_location location = std::source_location::current(); (void)location; return 0; }"
+    "#include <cstdint>
+    #include <source_location>
+    #include <tuple>
+    std::int32_t main() { std::ignore = std::source_location::current(); return 0; }"
     HAVE_SOURCE_LOCATION
   )
 endif()
@@ -52,8 +80,9 @@ endif()
 check_include_file_cxx(span HAVE_SPAN_INCLUDE)
 if(HAVE_SPAN_INCLUDE)
   check_cxx_source_compiles(
-    "#include <span>
-    int main(int argc, char **argv) { std::span args( argv, static_cast<std::size_t>( argc ) ); return 0; }"
+    "#include <cstdint>
+    #include <span>
+    std::int32_t main( std::int32_t argc, char **argv ) { std::span args( argv, static_cast<std::size_t>( argc ) ); (void)args; return 0; }"
     HAVE_SPAN
   )
 endif()

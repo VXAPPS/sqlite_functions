@@ -36,7 +36,7 @@ option(CORE_BUILD_TESTS "Build tests" OFF)
 
 FetchContent_Declare(modern.cpp.core
   GIT_REPOSITORY https://github.com/VXAPPS/modern.cpp.core.git
-  GIT_TAG v0.6
+  GIT_TAG master
   GIT_SHALLOW 1
 )
 

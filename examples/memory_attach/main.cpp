@@ -78,11 +78,11 @@ static std::int32_t printResultAndExit( std::int32_t _code,
 std::int32_t main() {
 
   /* Open database */
-  std::error_code error_code {};
-  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:", error_code ) };
-  if ( !database || error_code ) {
+  std::error_code error {};
+  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:", error ) };
+  if ( !database || error ) {
 
-    std::cout << "ERROR: '" << error_code.message() << "'" << std::endl;
+    std::cout << "ERROR: '" << error.message() << "'" << std::endl;
     std::cout << std::endl;
     return EXIT_FAILURE;
   }

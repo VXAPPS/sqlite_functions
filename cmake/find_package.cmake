@@ -28,10 +28,22 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+if (UNIX)
+  set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "[cC][lL][aA][nN][gG]")
+  set(CMAKE_REQUIRED_FLAGS "-Wno-unreachable-code-return -Wno-zero-as-null-pointer-constant")
+endif()
 find_package(Threads REQUIRED)
+
 if(UNIX AND NOT APPLE)
   set(ICU_ROOT /usr/lib/x86_64-linux-gnu/)
 elseif(APPLE)
   set(ICU_ROOT /usr/local/opt/icu4c/)
 endif()
 find_package(ICU 70 COMPONENTS i18n uc)
+
+#if(APPLE)
+#  /usr/local/opt/sqlite3
+#endif()
+find_package(SQLite3)

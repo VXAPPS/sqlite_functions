@@ -262,7 +262,7 @@ namespace vx::sqlite_utils {
     return {};
   }
 
-  double pi() { return std::atan(1)*4; }
+  static double pi() { return std::atan(1)*4; }
 
   void distance( sqlite3_context *_context,
                  std::int32_t _argc,

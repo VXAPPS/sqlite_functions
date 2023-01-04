@@ -56,7 +56,9 @@ endif()
 if(WIN32)
   include(${CMAKE}/fetch/jom.cmake)
 endif()
-include(${CMAKE}/external/sqlite.cmake)
+if(NOT SQLite3_FOUND)
+  include(${CMAKE}/external/sqlite3.cmake)
+endif()
 
 add_subdirectory(source)
 

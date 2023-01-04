@@ -67,8 +67,8 @@ static std::int32_t printResultAndExit( std::int32_t _code,
 std::int32_t main() {
 
   /* Open database */
-  std::error_code error_code {};
-  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:", error_code ) };
+  std::error_code error {};
+  const auto database { vx::sqlite_utils::sqlite3_make_unique( ":memory:", error ) };
   if ( !database ) {
 
     std::cout << "ERROR: '" << sqlite3_errmsg( database.get() ) << "'" << std::endl;
@@ -125,7 +125,7 @@ std::int32_t main() {
 #endif
 
   sql = "SELECT DISTANCE(latitude, longitude, ?1, ?2) AS distance FROM cities WHERE city IS 'Munich'";
-  const auto statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error_code );
+  const auto statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error );
   resultCode = sqlite3_bind_double( statement.get(), 1, latitude );
   if ( resultCode != SQLITE_OK ) {
 
