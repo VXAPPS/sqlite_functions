@@ -43,7 +43,4 @@ elseif(APPLE)
 endif()
 find_package(ICU 70 COMPONENTS i18n uc)
 
-#if(APPLE)
-#  /usr/local/opt/sqlite3
-#endif()
 find_package(SQLite3)
