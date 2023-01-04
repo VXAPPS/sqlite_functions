@@ -60,8 +60,6 @@ namespace std { // NOSONAR
 
 #ifdef _WIN32
   using ::strncpy_s;
-#else
-  using ::strlcpy;
 #endif
 }
 
@@ -377,12 +375,12 @@ namespace vx::sqlite_utils {
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
 #ifdef _WIN32
-    std::strncpy_s( databuffer, str.size() + 1, str.data(), str.size() + 1 );
+    std::strncpy_s( databuffer, str.size(), str.data(), str.size() );
 #else
-    std::strlcpy( databuffer, str.data(), str.size() + 1 );
+    std::strncpy( databuffer, str.data(), str.size() );
 #endif
 
-    sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() + 1 ), sqlite3_free );
+    sqlite3_result_text( _context, databuffer, static_cast<int>( str.size() ), sqlite3_free );
   }
 
   std::int32_t outputCallback( [[maybe_unused]] void *_data, // NOSONAR more meaningful than void
