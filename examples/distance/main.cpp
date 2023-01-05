@@ -142,7 +142,7 @@ std::int32_t main() {
 
     std::cout << "RESULT AFTER BIND MISMATCH" << std::endl;
     std::cout << "EXPECT: '" << sql2Expect << "'" << std::endl;
-    std::cout << "GOT: '" << expandedSql << "'" << std::endl;
+    std::cout << "GOT: '" << expandedSql.get() << "'" << std::endl;
     return EXIT_FAILURE;
   }
 #endif
