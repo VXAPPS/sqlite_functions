@@ -55,9 +55,9 @@ else()
     PATHS ${SQLITE3_INCLUDE_SEARCH_PATHS})
 endif()
 
-IF (NOT SQLITE3_INCLUDE_DIR)
-     MESSAGE(WARNING "Could not find sqlite3.h in ${SQLITE3_INCLUDE_SEARCH_PATHS}")
-ENDIF (NOT SQLITE3_INCLUDE_DIR)
+if(NOT SQLITE3_INCLUDE_DIR)
+  message(WARNING "Could not find sqlite3.h in ${SQLITE3_INCLUDE_SEARCH_PATHS}")
+endif()
 
 set(SQLITE3_NAMES sqlite3_i sqlite3)
 
@@ -75,34 +75,46 @@ else()
     PATHS ${SQLITE3_LIB_SEARCH_PATHS})
 endif()
 
-set(SQLITE3_LIBRARIES
-  ${SQLITE3_LIBRARIES}
-  ${SQLITE3_LIBRARY})
+set(SQLITE3_LIBRARIES ${SQLITE3_LIBRARIES} ${SQLITE3_LIBRARY})
 
-# Handle the QUIETLY and REQUIRED arguments and set SQLITE3_FOUND to TRUE
-# if all listed variables are TRUE
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(SQLite3
-  DEFAULT_MSG
-  SQLITE3_LIBRARIES
-  SQLITE3_INCLUDE_DIR)
+check_library_exists("${SQLITE3_LIBRARY}" sqlite3_deserialize "" SQLITE3_DESERIALIZE)
+if(NOT SQLITE3_DESERIALIZE)
+  message(WARNING "Found sqlite, but the sqlite3_deserialize is disabled")
+endif()
 
-mark_as_advanced(SQLITE3_LIBRARY SQLITE3_INCLUDE_DIR SQLITE3_LIBRARIES)
-
-if(NOT SQLite3_FIND_QUIETLY)
-  message(STATUS "Found SQLite3: ${SQLITE3_LIBRARY}")
-endif(NOT SQLite3_FIND_QUIETLY)
+check_library_exists("${SQLITE3_LIBRARY}" sqlite3_serialize "" SQLITE3_SERIALIZE)
+if(NOT SQLITE3_SERIALIZE)
+  message(WARNING "Found sqlite, but the sqlite3_serialize is disabled")
+endif()
 
 check_library_exists("${SQLITE3_LIBRARY}" sqlite3_enable_load_extension "" SQLITE3_LOAD_EXTENSION)
-IF (NOT SQLITE3_LOAD_EXTENSION)
-    if (APPLE)
-        MESSAGE(WARNING "Found sqlite, but the sqlite3_enable_load_extension is disabled.  On macOS, you should `brew install sqlite3` as the system sqlite3 library disables extension loading by default for security reasons.")
-    else()
-        MESSAGE(WARNING "Found sqlite, but the sqlite3_enable_load_extension is disabled")
-    endif()
-ENDIF (NOT SQLITE3_LOAD_EXTENSION)
+if(NOT SQLITE3_LOAD_EXTENSION)
+  if(APPLE)
+    message(WARNING "Found sqlite, but the sqlite3_enable_load_extension is disabled. On macOS, you should `brew install sqlite3` as the system sqlite3 library disables extension loading by default for security reasons.")
+  else()
+    message(WARNING "Found sqlite, but the sqlite3_enable_load_extension is disabled")
+  endif()
+endif()
 
-add_library(SQLite::SQLite3 INTERFACE IMPORTED)
-set_target_properties(SQLite::SQLite3 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "${SQLITE3_LIBRARIES}"
-  INTERFACE_INCLUDE_DIRECTORIES "${SQLITE3_INCLUDE_DIR}")
+if(NOT SQLITE3_DESERIALIZE OR NOT SQLITE3_SERIALIZE)
+  unset(SQLITE3_LIBRARY)
+  unset(SQLITE3_LIBRARIES)
+  # mark_as_advanced(CLEAR SQLITE3_LIBRARY SQLITE3_INCLUDE_DIR SQLITE3_LIBRARIES)
+else()
+  # Handle the QUIETLY and REQUIRED arguments and set SQLITE3_FOUND to TRUE
+  # if all listed variables are TRUE
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(SQLite3 DEFAULT_MSG SQLITE3_LIBRARIES SQLITE3_INCLUDE_DIR)
+  mark_as_advanced(SQLITE3_LIBRARY SQLITE3_INCLUDE_DIR SQLITE3_LIBRARIES)
+
+  if(NOT SQLite3_FIND_QUIETLY)
+    message(STATUS "Found SQLite3: ${SQLITE3_LIBRARY}")
+  endif()
+
+  add_library(SQLite::SQLite3 INTERFACE IMPORTED)
+  set_target_properties(SQLite::SQLite3
+    PROPERTIES
+    INTERFACE_LINK_LIBRARIES "${SQLITE3_LIBRARIES}"
+    INTERFACE_INCLUDE_DIRECTORIES "${SQLITE3_INCLUDE_DIR}"
+  )
+endif()
