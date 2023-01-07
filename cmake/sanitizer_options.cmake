@@ -39,7 +39,7 @@ if(SANITIZER_ADDRESS)
     endif()
   endif()
 
-  # gcc needs ignore link order
+  # gcc needs LD_PRELOAD of libasan and ignore link order
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
     set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ASAN_OPTIONS=verify_asan_link_order=0)
@@ -51,6 +51,10 @@ if(SANITIZER_ADDRESS)
 
     # copy runtime library
     get_filename_component(ASAN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
-    file(COPY ${ASAN_DIR}/clang_rt.asan_dbg_dynamic-x86_64.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      file(COPY ${ASAN_DIR}/clang_rt.asan_dbg_dynamic-i386.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    else()
+      file(COPY ${ASAN_DIR}/clang_rt.asan_dbg_dynamic-x86_64.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
   endif()
 endif()

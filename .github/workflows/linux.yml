@@ -25,7 +25,8 @@ jobs:
           ubuntu-22.04-clang-11,
 #          ubuntu-22.04-clang-12,
           ubuntu-22.04-clang-13,
-          ubuntu-22.04-clang-14
+          ubuntu-22.04-clang-14,
+          ubuntu-22.04-clang-15
         ]
         config: [Debug, Release]
         include:
@@ -84,11 +85,18 @@ jobs:
             compiler: clang
             version: 14
 
+          - name: ubuntu-22.04-clang-15
+            os: ubuntu-22.04
+            compiler: clang
+            version: 15
+
     steps:
       - uses: actions/checkout@v3
 
       - name: Dependencies
         run: |
+            wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+            sudo apt-add-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
             sudo apt update
             sudo apt install -y ninja-build
             sudo apt install -y libicu-dev

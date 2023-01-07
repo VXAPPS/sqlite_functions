@@ -1,5 +1,5 @@
 # sqlite_functions
-Sqlite3 function extension in most native and modern C++17 or C++20.
+Sqlite3 function extension in most native and modern C++23 or C++20 or at least C+17.
 
 ## Build
 ```bash
