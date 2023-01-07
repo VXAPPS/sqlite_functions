@@ -47,7 +47,28 @@ function(make_test target)
 endfunction()
 
 make_test(distance)
-make_test(dump)
+
+project(test_dump)
+
+add_executable(${PROJECT_NAME}
+  ${PROJECT_NAME}.cpp
+)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "[cC][lL][aA][nN][gG]" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+  set(${PROJECT_NAME}_libs stdc++fs)
+endif()
+
+target_link_libraries(${PROJECT_NAME}
+  PRIVATE
+  SQLite::Functions
+  GTest::gtest_main
+  ${${PROJECT_NAME}_libs}
+)
+
+gtest_add_tests(${PROJECT_NAME}
+  SOURCES ${PROJECT_NAME}.cpp
+)
+
 make_test(transliteration)
 
 include(${CMAKE}/sanitizer_options.cmake)
