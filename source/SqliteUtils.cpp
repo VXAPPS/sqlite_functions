@@ -50,6 +50,7 @@
 #include <unicode/unistr.h>
 
 /* modern.cpp.core */
+#include <Logger.h>
 #include <StringUtils.h>
 
 /* local header */
@@ -68,6 +69,9 @@ namespace vx::sqlite_utils {
   constexpr std::int32_t halfCircleDegree = 180;
 
   constexpr double earthBlubKm = 6378.137;
+
+  /** @brief Buffer size for errno. */
+  constexpr std::int32_t errnoBufferSize = 128;
 
   void sqlite3_deleter::operator()( sqlite3 *_handle ) const noexcept {
 
@@ -375,7 +379,25 @@ namespace vx::sqlite_utils {
 
     auto *databuffer( static_cast<char *>( sqlite3_malloc64( sizeof( char ) * str.size() ) ) );
 #ifdef _WIN32
-    std::strncpy_s( databuffer, str.size(), str.data(), str.size() );
+    errno_t error = std::strncpy_s( databuffer, str.size() + 1, str.data(), str.size() );
+    if ( error ) {
+
+      std::vector<char> errnoBuffer {};
+      try {
+
+        errnoBuffer.resize( errnoBufferSize );
+      }
+      catch ( const std::bad_alloc &_exception ) {
+
+        logFatal() << "bad_alloc:" << _exception.what();
+      }
+      catch ( const std::exception &_exception ) {
+
+        logFatal() << _exception.what();
+      }
+      std::ignore = strerror_s( errnoBuffer.data(), errnoBuffer.size(), error );
+      logError() << std::string( std::cbegin( errnoBuffer ), std::cend( errnoBuffer ) );
+    }
 #else
     std::strncpy( databuffer, str.data(), str.size() );
 #endif
