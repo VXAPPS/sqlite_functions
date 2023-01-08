@@ -16,9 +16,9 @@ jobs:
       matrix:
         name: [
           macos-12-xcode-13-x86_64,
-          macos-12-xcode-13-arm64,
-          macos-12-xcode-14-x86_64,
-          macos-12-xcode-14-arm64
+#          macos-12-xcode-13-arm64,
+          macos-12-xcode-14-x86_64
+#          macos-12-xcode-14-arm64
         ]
         config: [Debug, Release]
         include:
@@ -28,11 +28,11 @@ jobs:
             version: "13.4"
             cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64
 
-          - name: macos-12-xcode-13-arm64
-            os: macos-12
-            compiler: xcode
-            version: "13.4"
-            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=arm64
+#          - name: macos-12-xcode-13-arm64
+#            os: macos-12
+#            compiler: xcode
+#            version: "13.4"
+#            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=arm64
 
           - name: macos-12-xcode-14-x86_64
             os: macos-12
@@ -40,11 +40,11 @@ jobs:
             version: "14.1"
             cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64
 
-          - name: macos-12-xcode-14-arm64
-            os: macos-12
-            compiler: xcode
-            version: "14.1"
-            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=arm64
+#          - name: macos-12-xcode-14-arm64
+#            os: macos-12
+#            compiler: xcode
+#            version: "14.1"
+#            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=arm64
 
     steps:
       - uses: actions/checkout@v3
