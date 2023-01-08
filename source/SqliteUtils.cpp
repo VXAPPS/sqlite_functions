@@ -70,8 +70,10 @@ namespace vx::sqlite_utils {
 
   constexpr double earthBlubKm = 6378.137;
 
+#ifdef WIN32
   /** @brief Buffer size for errno. */
   constexpr std::int32_t errnoBufferSize = 128;
+#endif
 
   void sqlite3_deleter::operator()( sqlite3 *_handle ) const noexcept {
 
