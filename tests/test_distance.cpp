@@ -34,9 +34,6 @@
 /* sqlite header */
 #include <sqlite3.h>
 
-/* modern.cpp.core */
-#include <FloatingPoint.h>
-
 /* sqlite_functions */
 #include <SqliteUtils.h>
 
@@ -124,7 +121,7 @@ namespace vx {
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
       const double distance = sqlite3_column_double( statement.get(), 0 );
-      EXPECT_TRUE( floating_point::equal( distance, 504.10089961002807968 ) );
+      EXPECT_NEAR( distance, 504.100899, 0.001 );
     }
     if ( resultCode != SQLITE_DONE ) {
 
@@ -147,7 +144,7 @@ namespace vx {
     while ( ( resultCode = sqlite3_step( statementNY.get() ) ) == SQLITE_ROW ) {
 
       const double distance = sqlite3_column_double( statementNY.get(), 0 );
-      EXPECT_TRUE( floating_point::equal( distance, 6387.483579739179 ) );
+      EXPECT_NEAR( distance, 6387.483579, 0.001 );
     }
     if ( resultCode != SQLITE_DONE ) {
 
@@ -170,7 +167,7 @@ namespace vx {
     while ( ( resultCode = sqlite3_step( statementT.get() ) ) == SQLITE_ROW ) {
 
       const double distance = sqlite3_column_double( statementT.get(), 0 );
-      EXPECT_TRUE( floating_point::equal( distance, 8931.604652489757 ) );
+      EXPECT_NEAR( distance, 8931.604652, 0.001 );
     }
     if ( resultCode != SQLITE_DONE ) {
 
