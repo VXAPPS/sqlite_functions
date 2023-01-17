@@ -55,6 +55,7 @@ if(WIN32)
 else()
   set(SQLITE_CONFIGURE_COMMAND
         CC=${CMAKE_C_COMPILER}
+        CFLAGS=--std=${CMAKE_C_STANDARD}
         LDFLAGS=${ZLIB_DIR}
         ${SQLITE_SRC}/src/SQLite/configure
     #    -q #quite
