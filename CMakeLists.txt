@@ -42,7 +42,7 @@ if (NOT DEFINED SQLITE_MASTER_PROJECT)
   endif()
 endif()
 
-project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES CXX)
+project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES C CXX)
 include(cmake/env.cmake)
 
 # Fetch Content Dependencies

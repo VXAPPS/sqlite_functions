@@ -45,6 +45,32 @@ cmake_host_system_information(RESULT CPU_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
 # CMake
 set(CMAKE ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+# Force C23 or C17 if available
+include(CheckCCompilerFlag)
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" OR CMAKE_C_SIMULATE_ID STREQUAL "MSVC")
+  check_c_compiler_flag(/std:c23 HAVE_FLAG_STD_C23)
+  check_c_compiler_flag(/std:c17 HAVE_FLAG_STD_C17)
+  # Visual Studio 2019 will have clang-12, but cmake do not know how to set the standard for that.
+#  if(CMAKE_CXX_COMPILER_ID MATCHES Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13.0)
+#    set(HAVE_FLAG_STD_CXX23 OFF)
+#  endif()
+else()
+  check_c_compiler_flag(-std=c23 HAVE_FLAG_STD_C23)
+  check_c_compiler_flag(-std=c17 HAVE_FLAG_STD_C17)
+#  check_cxx_compiler_flag(-std=c++20 HAVE_FLAG_STD_CXX20)
+#  check_cxx_compiler_flag(-std=c++2a HAVE_FLAG_STD_CXX2A)
+endif()
+
+if(HAVE_FLAG_STD_C23)
+  set(CMAKE_C_STANDARD 23)
+elseif(HAVE_FLAG_STD_C17)
+  set(CMAKE_C_STANDARD 17)
+else()
+  set(CMAKE_C_STANDARD 11)
+endif()
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 # Force C++23 or C++20 if available
 include(CheckCXXCompilerFlag)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" OR CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
