@@ -17,8 +17,9 @@ include(ExternalProject)
 
 set(ZLIB_SRC ${CMAKE_BINARY_DIR}/_deps/zlib-src)
 set(ZLIB_INSTALL ${CMAKE_BINARY_DIR}/_deps/zlib-install)
-if (UNIX)
+if(UNIX)
   set(ZLIB_LIBRARY ${ZLIB_INSTALL}/lib/libz.a)
+  set(ZLIB_OS_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
 else()
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(ZLIB_LIBRARY ${ZLIB_INSTALL}/lib/zlibstaticd.lib)
@@ -36,11 +37,13 @@ ExternalProject_Add(ZLIB
   CMAKE_ARGS
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
-    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DCMAKE_INSTALL_PREFIX:PATH=${ZLIB_INSTALL}
+    -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+    ${ZLIB_OS_ARGS}
   INSTALL_DIR ${ZLIB_INSTALL}
   BUILD_BYPRODUCTS ${ZLIB_LIBRARY}
   UPDATE_COMMAND ""
+  PATCH_COMMAND patch -t < ${CMAKE_SOURCE_DIR}/cmake/patches/zlib.patch
 )
 
 # We cannot use find_library because ExternalProject_Add() is performed at build time.
