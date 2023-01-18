@@ -28,31 +28,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# first we can indicate the documentation build as an option and set it to ON by default
-option(BUILD_DOC "Build documentation" OFF)
+include(FetchContent)
 
-# check if Doxygen is installed
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-  # set input and output files
-  set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
-  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/docs/Doxyfile)
+FetchContent_Declare(doxygen-awesome-css
+  GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css.git
+  GIT_TAG v2.1.0
+  GIT_SHALLOW 1
+)
 
-  # request to configure the file
-  configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/docs/logo.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/docs)
-
-  if (BUILD_DOC)
-    message("Doxygen build started")
-
-    # note the option ALL which allows to build the docs together with the application
-    add_custom_target(doc_doxygen ALL
-      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      COMMENT "Generating API documentation with Doxygen"
-      VERBATIM)
-  endif()
-else()
-  message("Doxygen need to be installed to generate the doxygen documentation")
-endif()
+FetchContent_MakeAvailable(doxygen-awesome-css)

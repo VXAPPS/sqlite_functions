@@ -28,30 +28,32 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-function(make_test target)
-  project(test_${target})
+# first we can indicate the documentation build as an option and set it to ON by default
+option(BUILD_DOC "Build documentation" OFF)
 
-  add_executable(${PROJECT_NAME}
-    ${PROJECT_NAME}.cpp
-  )
+# check if Doxygen is installed
+find_package(Doxygen)
 
-  target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-    SQLite::Functions
-    GTest::gtest_main
-  )
+if(DOXYGEN_FOUND)
+  # set input and output files
+  set(DOXYGEN_IN ${CMAKE_SOURCE_DIR}/docs/Doxyfile.in)
+  set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/docs/Doxyfile)
 
-  gtest_add_tests(${PROJECT_NAME}
-    SOURCES ${PROJECT_NAME}.cpp
-  )
-endfunction()
+  # request to configure the file
+  configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
-make_test(distance)
-make_test(dump)
-make_test(transliteration)
+  file(COPY ${CMAKE_SOURCE_DIR}/docs/logo.png DESTINATION ${CMAKE_BINARY_DIR}/docs)
 
-if(SQLITE_MASTER_PROJECT AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-  include(${CMAKE}/coverage.cmake)
-  include(${CMAKE}/sanitizer_options.cmake)
-  include(${CMAKE}/test_options.cmake)
-endif()
+  add_custom_target(documentation-generation
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Generating documentation"
+    VERBATIM)
+
+  add_custom_target(documentation
+    COMMAND python ${CMAKE_SOURCE_DIR}/docs/post_doxygen.py ${CMAKE_BINARY_DIR}/docs
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Postprocessing documentation"
+    DEPENDS documentation-generation
+      VERBATIM)
+  endif()

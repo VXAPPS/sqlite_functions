@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Florian Becker <fb@vxapps.com> (VX APPS).
+# Copyright (c) 2023 Florian Becker <fb@vxapps.com> (VX APPS).
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,30 +28,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-function(make_test target)
-  project(test_${target})
-
-  add_executable(${PROJECT_NAME}
-    ${PROJECT_NAME}.cpp
-  )
-
-  target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-    SQLite::Functions
-    GTest::gtest_main
-  )
-
-  gtest_add_tests(${PROJECT_NAME}
-    SOURCES ${PROJECT_NAME}.cpp
-  )
-endfunction()
-
-make_test(distance)
-make_test(dump)
-make_test(transliteration)
-
-if(SQLITE_MASTER_PROJECT AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-  include(${CMAKE}/coverage.cmake)
-  include(${CMAKE}/sanitizer_options.cmake)
-  include(${CMAKE}/test_options.cmake)
+if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
+  foreach(SINGLE_TEST ${ALL_TESTS})
+    if(ASAN_OPTIONS)
+      set_tests_properties(${SINGLE_TEST} PROPERTIES ENVIRONMENT "LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${SINGLE_TEST}.profraw;${ASAN_OPTIONS}")
+    else()
+      set_tests_properties(${SINGLE_TEST} PROPERTIES ENVIRONMENT "LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${SINGLE_TEST}.profraw")
+    endif()
+  endforeach()
 endif()

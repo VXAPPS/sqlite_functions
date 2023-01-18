@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright (c) 2023 Florian Becker <fb@vxapps.com> (VX APPS).
 # All rights reserved.
@@ -28,36 +29,61 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-if(SANITIZER_ADDRESS)
-  # clang-11 cannot allocate
-  if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-    string(REPLACE "." ";" VERSION_LIST ${CMAKE_CXX_COMPILER_VERSION})
-    list(GET VERSION_LIST 0 CLANG_VERSION_MAJOR)
-    if(CLANG_VERSION_MAJOR EQUAL 11)
-      set(ASAN_OPTIONS ASAN_OPTIONS=use_sigaltstack=false)
-      get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
-      set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ${ASAN_OPTIONS})
-    endif()
-  endif()
+# Imports
+import os
+import sys
 
-  # gcc needs LD_PRELOAD of libasan and ignore link order
-  if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
-    set(ASAN_OPTIONS ASAN_OPTIONS=verify_asan_link_order=0)
-    get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
-    set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ${ASAN_OPTIONS})
-  endif()
+# Workflow
+# 1. Find all .html files in $OUTPUT
+# 2. Find all external links, remove the .html suffix
+# 3. Open all external links in new browser window
 
-  if(WIN32)
-    set(ASAN_OPTIONS ASAN_OPTIONS=windows_hook_rtl_allocators=true)
-    get_property(ALL_TESTS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
-    set_tests_properties(${ALL_TESTS} PROPERTIES ENVIRONMENT ${ASAN_OPTIONS})
+folder = sys.argv[1] + "/html"
 
-    # copy runtime library
-    get_filename_component(ASAN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
-    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-      file(COPY ${ASAN_DIR}/clang_rt.asan_dbg_dynamic-i386.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    else()
-      file(COPY ${ASAN_DIR}/clang_rt.asan_dbg_dynamic-x86_64.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    endif()
-  endif()
-endif()
+# Fix all .html files
+for file in os.listdir(folder):
+  if file.endswith('.html'):
+    f = open(os.path.join(folder, file), 'r')
+    filedata = f.read()
+    f.close()
+
+    # find: 'href="https://' than find '.html"' and replace with '" target="_blank"'
+    pos = len(filedata)
+    while True:
+      pos = filedata.rfind('href="https://', 0, pos)
+      if pos == -1:
+        break
+
+      replace = filedata.find('.html"', pos + 1)
+      if replace == -1:
+        continue
+
+      filedata = filedata[:replace] + '" target="_blank"' + filedata[replace+6:]
+
+    f = open(os.path.join(folder, file),'w')
+    f.write(filedata)
+    f.close()
+
+# Fix all .js files
+for file in os.listdir(folder):
+  if file.endswith('.js'):
+    f = open(os.path.join(folder, file), 'r')
+    filedata = f.read()
+    f.close()
+
+    # find: 'href="https://' than find '.html"' and replace with '" target="_blank"'
+    pos = len(filedata)
+    while True:
+      pos = filedata.rfind('"https://', 0, pos)
+      if pos == -1:
+        break
+
+      replace = filedata.find('.html', pos + 1)
+      if replace == -1:
+        continue
+
+      filedata = filedata[:replace] + '"' + filedata[replace+6:]
+
+    f = open(os.path.join(folder, file),'w')
+    f.write(filedata)
+    f.close()

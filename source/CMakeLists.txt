@@ -55,3 +55,25 @@ target_link_libraries(${PROJECT_NAME}
   ICU::uc
   ICU::i18n
 )
+
+add_custom_target(${PROJECT_NAME}_documentation
+  SOURCES
+  ../docs/corefoundation-doxygen-web.tag.xml
+  ../docs/cppreference-doxygen-web.tag.xml
+  ../docs/Doxyfile.in
+  ../docs/footer.html
+  ../docs/header.html
+  ../docs/magic_enum-doxygen-web.tag.xml
+  ../docs/post_doxygen.py
+  ../README.md
+)
+
+add_custom_target(${PROJECT_NAME}_workflows
+  SOURCES
+#  ../.github/workflows/linux-codeql.yml
+  ../.github/workflows/linux.yml
+#  ../.github/workflows/macos-codeql.yml
+  ../.github/workflows/macos.yml
+#  ../.github/workflows/windows-codeql.yml
+  ../.github/workflows/windows.yml
+)

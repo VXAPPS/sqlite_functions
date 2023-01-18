@@ -16,9 +16,9 @@ jobs:
       matrix:
         name: [
           macos-12-xcode-13-x86_64,
-#          macos-12-xcode-13-arm64,
-          macos-12-xcode-14-x86_64
-#          macos-12-xcode-14-arm64
+          macos-12-xcode-13-arm64,
+          macos-12-xcode-14-x86_64,
+          macos-12-xcode-14-arm64
         ]
         config: [Debug, Release]
         include:
@@ -26,25 +26,25 @@ jobs:
             os: macos-12
             compiler: xcode
             version: "13.4"
-            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64
+            architecture: x86_64
 
-#          - name: macos-12-xcode-13-arm64
-#            os: macos-12
-#            compiler: xcode
-#            version: "13.4"
-#            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=arm64
+          - name: macos-12-xcode-13-arm64
+            os: macos-12
+            compiler: xcode
+            version: "13.4"
+            architecture: arm64
 
           - name: macos-12-xcode-14-x86_64
             os: macos-12
             compiler: xcode
-            version: "14.1"
-            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64
+            version: "14.2"
+            architecture: x86_64
 
-#          - name: macos-12-xcode-14-arm64
-#            os: macos-12
-#            compiler: xcode
-#            version: "14.1"
-#            cmake: -DCMAKE_OSX_ARCHITECTURES:STRING=arm64
+          - name: macos-12-xcode-14-arm64
+            os: macos-12
+            compiler: xcode
+            version: "14.2"
+            architecture: arm64
 
     steps:
       - uses: actions/checkout@v3
@@ -52,14 +52,10 @@ jobs:
       - name: Dependencies
         run: |
             brew install ninja
+            brew install doxygen graphviz
             brew install icu4c
             brew install sqlite
 
-            if [ "${{matrix.compiler}}" = "gcc" ]; then
-              brew install gcc@${{matrix.version}}
-              echo "CC=gcc-${{matrix.version}}" >> $GITHUB_ENV
-              echo "CXX=g++-${{matrix.version}}" >> $GITHUB_ENV
-            fi
             if [ "${{matrix.compiler}}" = "xcode" ]; then
               ls -ls /Applications/
               sudo xcode-select -switch /Applications/Xcode_${{matrix.version}}.app
@@ -67,29 +63,36 @@ jobs:
               echo "CXX=clang++" >> $GITHUB_ENV
             fi
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: 'cpp'
-
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE:STRING=${{matrix.config}} ${{matrix.cmake}}
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE:STRING=${{matrix.config}} -DCMAKE_OSX_ARCHITECTURES:STRING=${{matrix.architecture}}
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
         run: cmake --build . --config ${{matrix.config}}
 
-#       arm64 mac runner are not able to start the tests: [Unknown system error -86]
       - name: Test
+        if: matrix.architecture != 'arm64'
         working-directory: ${{runner.workspace}}/build
-        run: |
-            if [ "${{matrix.cmake}}" != "-DCMAKE_OSX_ARCHITECTURES:STRING=arm64" ]; then
-              ctest --output-on-failure -C ${{matrix.config}}
-            fi
+        run: ctest --output-on-failure -C ${{matrix.config}}
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+#      - name: Coverage
+#        if: matrix.config == 'Debug' && matrix.architecture != 'arm64'
+#        working-directory: ${{runner.workspace}}/build
+#        run: cmake --build . --target coverage
+
+#      - name: Archive Coverage
+#        if: matrix.config == 'Debug' && matrix.architecture != 'arm64'
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: coverage-macos
+#          path: |
+#                ${{runner.workspace}}/build/tests/coverage.${{matrix.compiler}}-${{matrix.version}}.txt
+#                ${{runner.workspace}}/build/tests/coverage.overview.${{matrix.compiler}}-${{matrix.version}}.txt
+
+      - name: Documentation
+        working-directory: ${{runner.workspace}}/build
+        run: cmake --build . --target documentation
