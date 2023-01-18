@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<tagfile>
+  <compound kind="class">
+    <name>sqlite3</name>
+    <filename>sqlite3.html</filename>
+  </compound>
+  <compound kind="class">
+    <name>sqlite3_context</name>
+    <filename>context.html</filename>
+  </compound>
+  <compound kind="class">
+    <name>sqlite3_stmt</name>
+    <filename>stmt.html</filename>
+  </compound>
+  <compound kind="class">
+    <name>sqlite3_value</name>
+    <filename>value.html</filename>
+  </compound>
+</tagfile>
