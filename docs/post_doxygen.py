@@ -43,7 +43,7 @@ folder = sys.argv[1] + "/html"
 # Fix all .html files
 for file in os.listdir(folder):
   if file.endswith('.html'):
-    f = open(os.path.join(folder, file), 'r')
+    f = open(os.path.join(folder, file), 'r', errors='ignore')
     filedata = f.read()
     f.close()
 
@@ -72,7 +72,7 @@ for file in os.listdir(folder):
 # Fix all .js files
 for file in os.listdir(folder):
   if file.endswith('.js'):
-    f = open(os.path.join(folder, file), 'r')
+    f = open(os.path.join(folder, file), 'r', errors='ignore')
     filedata = f.read()
     f.close()
 
