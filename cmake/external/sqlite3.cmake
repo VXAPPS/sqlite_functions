@@ -32,8 +32,6 @@ if(SQLite3_FOUND)
   return()
 endif()
 
-cmake_host_system_information(RESULT CPU_COUNT QUERY NUMBER_OF_PHYSICAL_CORES)
-
 include(ExternalProject)
 
 set(SQLITE_SRC ${CMAKE_BINARY_DIR}/_deps/sqlite-src)
@@ -44,6 +42,9 @@ if (UNIX)
 else()
   set(SQLITE_LIBRARY ${SQLITE_SRC}/src/SQLite/sqlite3.lib)
   set(SQLITE_INCLUDE_DIR ${SQLITE_SRC}/src/SQLite)
+endif()
+if(APPLE)
+  set(SQLITE_OS_ARGS -arch ${CMAKE_OSX_ARCHITECTURES})
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -59,7 +60,7 @@ if(WIN32)
 else()
   set(SQLITE_CONFIGURE_COMMAND
         CC=${CMAKE_C_COMPILER}
-        CFLAGS=--std=c${CMAKE_C_STANDARD}
+        CFLAGS=--std=c${CMAKE_C_STANDARD} ${SQLITE_OS_ARGS}
         LDFLAGS=${ZLIB_DIR}
         ${SQLITE_SRC}/src/SQLite/configure
     #    -q #quite
