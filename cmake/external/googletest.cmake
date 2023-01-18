@@ -32,7 +32,7 @@ include(ExternalProject)
 
 set(GOOGLETEST_SRC ${CMAKE_BINARY_DIR}/_deps/googletest-src)
 set(GOOGLETEST_INSTALL ${CMAKE_BINARY_DIR}/_deps/googletest-install)
-if (UNIX)
+if(UNIX)
   set(GOOGLETEST_LIBRARY ${GOOGLETEST_INSTALL}/lib/libgtest.a)
   set(GOOGLETEST_OS_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
 else()

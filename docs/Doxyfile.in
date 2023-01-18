@@ -2375,8 +2375,7 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               = docs/corefoundation-doxygen-web.tag.xml=https://developer.apple.com/documentation/corefoundation/ \
-                         docs/cppreference-doxygen-web.tag.xml=https://en.cppreference.com/w/ \
+TAGFILES               = docs/cppreference-doxygen-web.tag.xml=https://en.cppreference.com/w/ \
                          docs/magic_enum-doxygen-web.tag.xml=https://github.com/Neargye/ \
                          docs/sqlite3-doxygen-web.tag.xml=https://sqlite.org/c3ref/
 

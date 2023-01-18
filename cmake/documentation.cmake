@@ -53,5 +53,5 @@ if(DOXYGEN_FOUND)
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Postprocessing documentation"
     DEPENDS documentation-generation
-      VERBATIM)
-  endif()
+    VERBATIM)
+endif()

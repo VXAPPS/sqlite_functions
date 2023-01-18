@@ -56,7 +56,7 @@ else()
 endif()
 
 if(NOT SQLITE3_INCLUDE_DIR)
-  message(WARNING "Could not find sqlite3.h in ${SQLITE3_INCLUDE_SEARCH_PATHS}")
+  message(STATUS "Could not find sqlite3.h in ${SQLITE3_INCLUDE_SEARCH_PATHS}")
 endif()
 
 set(SQLITE3_NAMES sqlite3_i sqlite3)
@@ -79,20 +79,20 @@ set(SQLITE3_LIBRARIES ${SQLITE3_LIBRARIES} ${SQLITE3_LIBRARY})
 
 check_library_exists("${SQLITE3_LIBRARY}" sqlite3_deserialize "" SQLITE3_DESERIALIZE)
 if(NOT SQLITE3_DESERIALIZE)
-  message(WARNING "Found sqlite, but the sqlite3_deserialize is disabled")
+  message(STATUS "Found sqlite, but the sqlite3_deserialize is disabled")
 endif()
 
 check_library_exists("${SQLITE3_LIBRARY}" sqlite3_serialize "" SQLITE3_SERIALIZE)
 if(NOT SQLITE3_SERIALIZE)
-  message(WARNING "Found sqlite, but the sqlite3_serialize is disabled")
+  message(STATUS "Found sqlite, but the sqlite3_serialize is disabled")
 endif()
 
 check_library_exists("${SQLITE3_LIBRARY}" sqlite3_enable_load_extension "" SQLITE3_LOAD_EXTENSION)
 if(NOT SQLITE3_LOAD_EXTENSION)
   if(APPLE)
-    message(WARNING "Found sqlite, but the sqlite3_enable_load_extension is disabled. On macOS, you should `brew install sqlite3` as the system sqlite3 library disables extension loading by default for security reasons.")
+    message(STATUS "Found sqlite, but the sqlite3_enable_load_extension is disabled. On macOS, you should `brew install sqlite3` as the system sqlite3 library disables extension loading by default for security reasons.")
   else()
-    message(WARNING "Found sqlite, but the sqlite3_enable_load_extension is disabled")
+    message(STATUS "Found sqlite, but the sqlite3_enable_load_extension is disabled")
   endif()
 endif()
 

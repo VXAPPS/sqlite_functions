@@ -43,10 +43,15 @@ target_include_directories(${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}
 )
 
+if(CMAKE_CXX_COMPILER_ID MATCHES Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+  set(${PROJECT_NAME}_LIBS -lc++fs)
+endif()
+
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
   modern.cpp::core
   SQLite::SQLite3
+  ${${PROJECT_NAME}_LIBS}
   PRIVATE
   ICU::uc
   ICU::i18n
@@ -67,10 +72,10 @@ add_custom_target(${PROJECT_NAME}_documentation
 
 add_custom_target(${PROJECT_NAME}_workflows
   SOURCES
-#  ../.github/workflows/linux-codeql.yml
+  ../.github/workflows/linux-codeql.yml
   ../.github/workflows/linux.yml
-#  ../.github/workflows/macos-codeql.yml
+  ../.github/workflows/macos-codeql.yml
   ../.github/workflows/macos.yml
-#  ../.github/workflows/windows-codeql.yml
+  ../.github/workflows/windows-codeql.yml
   ../.github/workflows/windows.yml
 )
