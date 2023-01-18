@@ -28,6 +28,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+if(SQLite3_FOUND)
+  return()
+endif()
+
 cmake_host_system_information(RESULT CPU_COUNT QUERY NUMBER_OF_PHYSICAL_CORES)
 
 include(ExternalProject)
@@ -55,7 +59,7 @@ if(WIN32)
 else()
   set(SQLITE_CONFIGURE_COMMAND
         CC=${CMAKE_C_COMPILER}
-        CFLAGS=--std=${CMAKE_C_STANDARD}
+        CFLAGS='--std=${CMAKE_C_STANDARD}'
         LDFLAGS=${ZLIB_DIR}
         ${SQLITE_SRC}/src/SQLite/configure
     #    -q #quite

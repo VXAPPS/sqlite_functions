@@ -51,22 +51,13 @@ endif()
 
 # Fetch Content Dependencies
 include(${CMAKE}/fetch/doxygen-awesome-css.cmake)
+include(${CMAKE}/fetch/jom.cmake)
 include(${CMAKE}/fetch/modern.cpp.core.cmake)
 
 # External Project Dependencies
 include(${CMAKE}/external/zlib.cmake)
-
-if(NOT ICU_FOUND)
-  include(${CMAKE}/external/icu.cmake)
-endif()
-
-if(WIN32)
-  include(${CMAKE}/fetch/jom.cmake)
-endif()
-
-if(NOT SQLite3_FOUND)
-  include(${CMAKE}/external/sqlite3.cmake)
-endif()
+include(${CMAKE}/external/icu.cmake)
+include(${CMAKE}/external/sqlite3.cmake)
 
 add_subdirectory(source)
 

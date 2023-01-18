@@ -28,6 +28,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+if(NOT WIN32)
+  return()
+endif()
+
 include(FetchContent)
 
 set(JOM_EXECUTABLE ${CMAKE_BINARY_DIR}/_deps/jom-src/jom.exe)
