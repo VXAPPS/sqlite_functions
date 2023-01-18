@@ -31,10 +31,6 @@
 project(sqlite_functions)
 
 add_library(${PROJECT_NAME}
-  ../.github/workflows/linux.yml
-  ../.github/workflows/macos.yml
-  ../.github/workflows/windows.yml
-  ../README.md
   SqliteError.h
   SqliteUtils.cpp
   SqliteUtils.h

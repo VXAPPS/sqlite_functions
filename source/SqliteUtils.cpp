@@ -66,8 +66,14 @@ namespace std { // NOSONAR
 
 namespace vx::sqlite_utils {
 
+  /**
+   * @brief Degrees of a half round move.
+   */
   constexpr std::int32_t halfCircleDegree = 180;
 
+  /**
+   * @brief Earth km.
+   */
   constexpr double earthBlubKm = 6378.137;
 
 #ifdef WIN32
@@ -266,7 +272,11 @@ namespace vx::sqlite_utils {
     return {};
   }
 
-  static double pi() { return std::atan(1)*4; }
+  /**
+   * @brief Generate own PI.
+   * @return Calculated pi value.
+   */
+  static double pi() { return std::atan( 1 ) * 4; }
 
   void distance( sqlite3_context *_context,
                  std::int32_t _argc,
