@@ -48,7 +48,6 @@ target_link_libraries(${PROJECT_NAME}
   modern.cpp::core
   SQLite::SQLite3
   PRIVATE
-  ICU::data
   ICU::uc
   ICU::i18n
 )
