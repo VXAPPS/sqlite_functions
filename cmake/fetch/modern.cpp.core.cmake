@@ -30,9 +30,9 @@
 
 include(FetchContent)
 
-option(CORE_MASTER_PROJECT "Master project" OFF)
-option(CORE_BUILD_EXAMPLES "Build examples" OFF)
-option(CORE_BUILD_TESTS "Build tests" OFF)
+set(CORE_MASTER_PROJECT OFF)
+set(CORE_BUILD_EXAMPLES OFF)
+set(CORE_BUILD_TESTS OFF)
 
 FetchContent_Declare(modern.cpp.core
   GIT_REPOSITORY https://github.com/VXAPPS/modern.cpp.core.git
