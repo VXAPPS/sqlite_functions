@@ -107,6 +107,10 @@ jobs:
              sudo apt install -y libicu-dev
              sudo apt install -y sqlite3
 
+             if [ "${{matrix.os}}" = "ubuntu-20.04" ]; then
+               sudo apt install -y python3
+             fi
+
              if [ "${{matrix.compiler}}" = "gcc" ]; then
                sudo apt install -y g++-${{matrix.version}}
                echo "CC=gcc-${{matrix.version}}" >> $GITHUB_ENV
