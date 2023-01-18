@@ -42,7 +42,7 @@ if(UNIX AND NOT APPLE)
 elseif(APPLE)
   set(ICU_ROOT /usr/local/opt/icu4c/)
 endif()
-find_package(ICU 66 COMPONENTS i18n uc)
+find_package(ICU 66 COMPONENTS data i18n uc)
 
 if(NOT WIN32)
   find_package(SQLite3)

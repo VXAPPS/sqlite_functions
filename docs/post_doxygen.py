@@ -44,7 +44,6 @@ folder = sys.argv[1] + "/html"
 for file in os.listdir(folder):
   if file.endswith('.html'):
     f = open(os.path.join(folder, file), 'r')
-    print(file)
     filedata = f.read()
     f.close()
 
@@ -69,7 +68,6 @@ for file in os.listdir(folder):
 for file in os.listdir(folder):
   if file.endswith('.js'):
     f = open(os.path.join(folder, file), 'r')
-    print(file)
     filedata = f.read()
     f.close()
 

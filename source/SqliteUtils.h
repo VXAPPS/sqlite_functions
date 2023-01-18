@@ -189,7 +189,7 @@ namespace vx::sqlite_utils {
    * @param _columns   Column names.
    * @return Result code.
    */
-  std::int32_t outputCallback( void *_data,
+  std::int32_t outputCallback( [[maybe_unused]] void *_data,
                                std::int32_t _argc,
                                char **_argv,
                                char **_columns ) noexcept;
