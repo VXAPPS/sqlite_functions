@@ -14,11 +14,7 @@
 #
 ###############################################################################
 
-find_package(PkgConfig QUIET)
-pkg_check_modules(PC_SQLite3 QUIET sqlite3)
-
 set(SQLITE3_INCLUDE_SEARCH_PATHS
-  ${PC_SQLite3_INCLUDE_DIRS}
   /usr/include
   /usr/local/include
   $ENV{LIB_DIR}/include
@@ -35,7 +31,6 @@ set(SQLITE3_INCLUDE_SEARCH_PATHS
 
 
 set(SQLITE3_LIB_SEARCH_PATHS
-  ${PC_SQLite3_LIBRARY_DIRS}
   /usr/lib
   /usr/local/lib
   $ENV{LIB_DIR}/lib

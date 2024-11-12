@@ -136,6 +136,7 @@ jobs:
              sudo apt install -y doxygen graphviz
              sudo apt install -y libicu-dev
              sudo apt install -y libsqlite3-dev
+             sudo apt install -y libx11-dev
 
              if [ "${{matrix.compiler}}" = "gcc" ]; then
                sudo apt install -y g++-${{matrix.version}}
