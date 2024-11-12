@@ -14,7 +14,11 @@
 #
 ###############################################################################
 
+find_package(PkgConfig QUIET)
+pkg_check_modules(PC_SQLite3 QUIET sqlite3)
+
 set(SQLITE3_INCLUDE_SEARCH_PATHS
+  ${PC_SQLite3_INCLUDE_DIRS}
   /usr/include
   /usr/local/include
   $ENV{LIB_DIR}/include
@@ -26,10 +30,12 @@ set(SQLITE3_INCLUDE_SEARCH_PATHS
   $ENV{SystemDrive}/SQLite3/*/include
   $ENV{SQLITE_ROOT}/include
   ${SQLITE_ROOT_DIR}/include
-  $ENV{OSGEO4W_ROOT}/include)
+  $ENV{OSGEO4W_ROOT}/include
+)
 
 
 set(SQLITE3_LIB_SEARCH_PATHS
+  ${PC_SQLite3_LIBRARY_DIRS}
   /usr/lib
   /usr/local/lib
   $ENV{LIB_DIR}/lib
@@ -39,7 +45,8 @@ set(SQLITE3_LIB_SEARCH_PATHS
   $ENV{SystemDrive}/SQLite3/*/lib
   $ENV{SQLITE_ROOT}/lib
   ${SQLITE_ROOT_DIR}/lib
-  $ENV{OSGEO4W_ROOT}/lib)
+  $ENV{OSGEO4W_ROOT}/lib
+)
 
 if (APPLE)
   # on macOS, we try hard to prefer aftermarket sqlite3 installations, as the system sqlite3
