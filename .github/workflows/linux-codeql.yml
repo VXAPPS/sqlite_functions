@@ -91,14 +91,14 @@ jobs:
             version: 15
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Dependencies
         run: |
              if [ "${{matrix.version}}" = "15" ]; then
                wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|gpg --dearmor > llvm-snapshot.gpg
                sudo mv llvm-snapshot.gpg /etc/apt/trusted.gpg.d/
-               sudo apt-add-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
+               sudo apt-add-repository "deb https://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
              fi
 
              sudo apt update
