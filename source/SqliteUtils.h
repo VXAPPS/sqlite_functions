@@ -30,6 +30,9 @@
 
 #pragma once
 
+/* c header */
+#include <cstdint> // std::int32_t
+
 /* stl header */
 #include <memory>
 #include <string>

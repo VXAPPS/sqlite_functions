@@ -28,13 +28,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* c header */
+#include <cstdint> // std::int32_t
+#include <cstdlib> // EXIT_FAILURE, EXIT_SUCCESS
+
 /* stl header */
-#include <codecvt>
-#include <fstream>
 #include <iostream>
-#include <locale>
 #include <memory>
-#include <vector>
+#include <string>
+#include <system_error>
 
 /* sqlite header */
 #include <sqlite3.h>
@@ -64,15 +66,18 @@
  * Melbourne | -37.8136 |  144.9631
  */
 
-static std::int32_t printResultAndExit( std::int32_t _code,
-                                        const std::string &_message,
-                                        const std::string &_sql ) {
+namespace {
 
-  std::cout << "RESULT CODE: (" << _code << ")" << std::endl;
-  std::cout << "ERROR: '" << _message << "'" << std::endl;
-  std::cout << "SQL: '" << _sql << "'" << std::endl;
-  std::cout << std::endl;
-  return EXIT_FAILURE;
+  std::int32_t printResultAndExit( std::int32_t _code,
+                                   const std::string &_message,
+                                   const std::string &_sql ) {
+
+    std::cout << "RESULT CODE: (" << _code << ")" << std::endl;
+    std::cout << "ERROR: '" << _message << "'" << std::endl;
+    std::cout << "SQL: '" << _sql << "'" << std::endl;
+    std::cout << std::endl;
+    return EXIT_FAILURE;
+  }
 }
 
 std::int32_t main() {

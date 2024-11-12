@@ -30,10 +30,14 @@
 
 #pragma once
 
+/* c header */
+#include <cstdint> // std::int32_t
+
 /* stl header */
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 
 /* modern.cpp.core */
 #include <Singleton.h>

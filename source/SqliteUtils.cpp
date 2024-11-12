@@ -30,27 +30,35 @@
 
 /* c header */
 #include <cmath>
+#include <cstdint> // std::int32_t
 #include <cstring> // std::memcpy
 
 /* stl header */
 #include <filesystem>
 #include <fstream>
+#include <iosfwd>
 #include <iostream>
+#include <memory>
 #include <numeric>
+#include <optional>
 #if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
   #include <span>
 #endif
+#include <string>
+#include <system_error>
 #include <vector>
 
 /* sqlite header */
 #include <sqlite3.h>
 
 /* icu header */
+#include <unicode/stringpiece.h>
 #include <unicode/translit.h>
 #include <unicode/unistr.h>
+#include <unicode/utrans.h>
+#include <unicode/utypes.h>
 
 /* modern.cpp.core */
-#include <Logger.h>
 #include <StringUtils.h>
 
 /* local header */
@@ -272,11 +280,14 @@ namespace vx::sqlite_utils {
     return {};
   }
 
-  /**
+  namespace {
+
+    /**
    * @brief Generate own PI.
    * @return Calculated pi value.
    */
-  static double pi() { return std::atan( 1 ) * 4; }
+    double pi() { return std::atan( 1 ) * 4; }
+  }
 
   void distance( sqlite3_context *_context,
                  std::int32_t _argc,

@@ -28,14 +28,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* stl header */
-#include <filesystem>
+/* c header */
+#include <cstdint> // std::int32_t
 
 /* gtest header */
 #include <gtest/gtest.h>
 
 /* sqlite header */
 #include <sqlite3.h>
+
+/* stl header */
+#include <filesystem>
+#include <string_view>
+#include <system_error>
 
 /* sqlite_functions */
 #include <SqliteUtils.h>

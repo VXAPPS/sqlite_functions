@@ -28,11 +28,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* c header */
+#include <cstdint> // std::int32_t
+
 /* gtest header */
 #include <gtest/gtest.h>
 
 /* sqlite header */
 #include <sqlite3.h>
+
+/* stl header */
+#include <optional>
+#include <system_error>
+#include <vector>
 
 /* modern.cpp.core */
 #include <StringUtils.h>
