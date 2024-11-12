@@ -32,7 +32,7 @@ set(ZLIB_INCLUDE_DIR ${ZLIB_INSTALL}/include)
 ExternalProject_Add(ZLIB
   PREFIX ${ZLIB_SRC}
   GIT_REPOSITORY https://github.com/madler/zlib.git
-  GIT_TAG v1.2.13
+  GIT_TAG v1.3.1
   GIT_SHALLOW 1
   CMAKE_ARGS
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
