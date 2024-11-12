@@ -19,7 +19,6 @@ jobs:
           ubuntu-20.04-gcc-10,
           ubuntu-22.04-gcc-11,
           ubuntu-22.04-gcc-12,
-          ubuntu-22.04-gcc-13,
           ubuntu-24.04-gcc-12,
           ubuntu-24.04-gcc-13,
           ubuntu-24.04-gcc-14,
@@ -56,11 +55,6 @@ jobs:
             os: ubuntu-22.04
             compiler: gcc
             version: 12
-
-          - name: ubuntu-22.04-gcc-13
-            os: ubuntu-22.04
-            compiler: gcc
-            version: 13
 
           - name: ubuntu-24.04-gcc-12
             os: ubuntu-24.04

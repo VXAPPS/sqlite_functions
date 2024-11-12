@@ -59,6 +59,9 @@
 #include <unicode/utypes.h>
 
 /* modern.cpp.core */
+#ifdef _WIN32
+  #include <Logger.h>
+#endif
 #include <StringUtils.h>
 
 /* local header */
