@@ -49,7 +49,7 @@ jobs:
           - name: windows-2022-msvc2022
             os: windows-2022
             compiler: cl
-            architecture: -A x64
+            architecture: x64
 
           - name: windows-2022-msvc2022-win32
             os: windows-2022
