@@ -41,7 +41,7 @@
 #include <memory>
 #include <numeric>
 #include <optional>
-#if __cplusplus > 201703L && ( defined __GNUC__ && __GNUC__ >= 10 || defined _MSC_VER && _MSC_VER >= 1926 || defined __clang__ && __clang_major__ >= 10 )
+#ifdef HAVE_SPAN
   #include <span>
 #endif
 #include <string>
