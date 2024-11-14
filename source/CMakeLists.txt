@@ -43,6 +43,11 @@ target_include_directories(${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}
 )
 
+target_compile_definitions(${PROJECT_NAME}
+  PRIVATE
+  $<$<BOOL:${HAVE_SPAN}>:HAVE_SPAN>
+)
+
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
   set(${PROJECT_NAME}_LIBS -lc++fs)
 endif()

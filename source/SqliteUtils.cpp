@@ -255,7 +255,12 @@ namespace vx::sqlite_utils {
       return { SQLITE_IOERR, SqliteErrorCategory::instance() };
     }
 
+#ifdef HAVE_SPAN
+    const std::span spanDump( dump.get(), static_cast<std::size_t>( serializationSize ) );
+    std::vector<char> converted( std::begin( spanDump ), std::end( spanDump ) );
+#else
     std::vector<char> converted( dump.get(), dump.get() + serializationSize );
+#endif
     if ( converted.empty() ) {
 
       SqliteErrorCategory::instance().setMessage( "Export not convertable." );
