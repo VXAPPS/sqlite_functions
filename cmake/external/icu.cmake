@@ -35,8 +35,8 @@ endif()
 include(FetchContent)
 
 FetchContent_Declare(icu-data
-  URL https://github.com/unicode-org/icu/releases/download/release-72-1/icu4c-72_1-data.zip
-  URL_HASH SHA512=9c7a85d22bcd27ccb8503ce3a64a0f88c6c495d6c0619398ec3a693f156dadd22bbc5c2993730cf6f25b4869206562f875c35ba35c462c6d3420d5d4e8de4faf
+  URL https://github.com/unicode-org/icu/releases/download/release-76-1/icu4c-76_1-data.zip
+  URL_HASH SHA512=db029885e4bb274ebabb71de35adfd16f463a1d23b30ee909991b0e443d9dae374f2289924358e9042b1159167626b314a94a482e1e01fe097f7b6a9695ec119
   SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/icu-src/src/ICU/data
 )
 
@@ -110,8 +110,8 @@ endif()
 ExternalProject_Add(ICU
 #  DEPENDS icu-data
   PREFIX ${ICU_SRC}
-  URL https://github.com/unicode-org/icu/releases/download/release-72-1/icu4c-72_1-src.zip
-  URL_HASH SHA512=d4bb1baed99674074f8af024dd159898eddaf4d71bc90f8d95b8448e96aac4b4e8358f755a516bfaf84baa34bf8657dc994459ef3bd72f54496b9ce2b0bd4636
+  URL https://github.com/unicode-org/icu/releases/download/release-76-1/icu4c-76_1-src.zip
+  URL_HASH SHA512=bd8519973e494d67b278689fa538d9756d6edcd95b82e687660bfdf23c68582c1b525e8aac73d23e22b39b3b481c918f40145e2b148267e8a6c0bdcb48d36645
   CONFIGURE_COMMAND ${ICU_CONFIGURE_COMMAND}
   BUILD_COMMAND ${ICU_BUILD_COMMAND}
   TEST_COMMAND ""
