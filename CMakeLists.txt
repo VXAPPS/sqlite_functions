@@ -42,7 +42,7 @@ if (NOT DEFINED SQLITE_MASTER_PROJECT)
   endif()
 endif()
 
-project(sqlite_functions VERSION 0.1 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES C CXX)
+project(sqlite_functions VERSION 0.3 DESCRIPTION "SQLite3 Functions" HOMEPAGE_URL "https://vxapps.com" LANGUAGES C CXX)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/env.cmake)
 include(${CMAKE}/checks.cmake)
 if(SQLITE_MASTER_PROJECT AND CMAKE_BUILD_TYPE STREQUAL Debug)
