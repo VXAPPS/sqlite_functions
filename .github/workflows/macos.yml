@@ -67,8 +67,8 @@ jobs:
         run: |
              brew install ninja
              brew install doxygen graphviz
-             brew install icu4c
-             brew install sqlite
+             arch -${{matrix.architecture}} brew install icu4c
+             arch -${{matrix.architecture}} brew install sqlite
 
              if [ "${{matrix.compiler}}" = "xcode" ]; then
                ls -ls /Applications/
