@@ -77,6 +77,8 @@ jobs:
                echo "CXX=clang++" >> $GITHUB_ENV
              fi
 
+             brew --prefix sqlite
+
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
 
