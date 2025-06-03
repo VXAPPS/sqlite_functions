@@ -132,7 +132,7 @@ namespace vx {
       GTEST_FAIL() << "RESULT CODE: (" << resultCode << ") ERROR: '" << sqlite3_errmsg( database.get() ) << "' SQL: '" << sql << "'";
     }
 
-    const auto statement = vx::sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error );
+    const auto statement = sqlite_utils::sqlite3_stmt_make_unique( database.get(), sql, error );
     while ( ( resultCode = sqlite3_step( statement.get() ) ) == SQLITE_ROW ) {
 
       const std::int32_t count = sqlite3_column_int( statement.get(), 0 );
