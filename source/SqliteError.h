@@ -71,7 +71,7 @@ namespace vx::sqlite {
     Empty = 16,         /**< Internal use only */
     Schema = 17,        /**< The database schema changed */
     TooBig = 18,        /**< String or BLOB exceeds size limit */
-    Consraint = 19,     /**< Abort due to constraint violation */
+    Constraint = 19,     /**< Abort due to constraint violation */
     Mismatch = 20,      /**< Data type mismatch */
     Misuse = 21,        /**< Library used incorrectly */
     NoLFS = 22,         /**< Uses OS features not supported on host */
